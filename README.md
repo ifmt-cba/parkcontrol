@@ -1,32 +1,59 @@
-# ParkControl
-Sistema de Gestão de Estacionamento
+# 🚗 ParkControl
 
-## Descrição do Projeto
-O ParkControl é um sistema desenvolvido para a gestão eficiente de estacionamentos, permitindo o controle de entrada e saída de veículos, gestão de vagas, cobrança automatizada e cadastro de clientes mensalistas. Criado como parte da disciplina de Engenharia de Software no curso de Engenharia da Computação - 2025/1, este projeto visa oferecer uma solução simples e eficaz para administração de estacionamentos.
+Sistema de Gestão de Estacionamento desenvolvido para facilitar o controle de entrada e saída de veículos, gerenciamento de vagas, gerenciamento de planos e relatórios financeiros.
 
-## Visão do Produto
-O ParkControl é um sistema de gerenciamento de estacionamentos que busca otimizar o fluxo de veículos
-e facilitar o processo de pagamento para clientes e administradores. Com ele, é possível:
- - Registrar entrada e saída de veículos.
+## 📌 Sobre o Projeto
 
- - Exibir a disponibilidade de vagas em tempo real para os frentistas.
+O **ParkControl** é um sistema voltado para estacionamentos que desejam gerenciar suas operações de forma digital e eficiente. Ele foi desenvolvido como parte de um projeto acadêmico da disciplina de **Engenharia de Software – 2025/01**.
 
- - Calcular automaticamente o tempo de permanência e o valor a ser pago.
+## 🎯 Funcionalidades
 
- - Oferecer planos de cobrança diferenciados para clientes avulsos e mensalistas.
+- ✅ Registro de entrada e saída de veículos
+- ✅ Gerenciamento de vagas (livres, ocupadas e manutenção)
+- ✅ Cadastro e edição de clientes mensalistas e diaristas
+- ✅ Geração de relatórios financeiros
+- ✅ Geração de cobranças automáticas para mensalistas
+- ✅ Recuperação de senha de usuários
+- ✅ Gestão de usuários e permissões (Administrador, Frentista, Contador, TI)
+- ✅ Solicitação e acompanhamento de manutenção de vagas
 
- - Aceitar pagamentos via Pix, cartão de débito e crédito.
+## 👥 Perfis de Usuário
 
- - Cadastrar clientes mensalistas com dados como nome, telefone, email, CPF, endereço, e dados do veículo.
+- **Administrador**: Gerencia usuários, planos, manutenção e supervisão geral do sistema.
+- **Frentista**: Controla entradas/saídas, visualiza vagas e solicita manutenção.
+- **Contador**: Gera relatórios, cobra mensalistas e acompanha pagamentos.
+  
+## 🛠️ Tecnologias Utilizadas
 
- - Gerenciar relatórios de faturamento e ocupação para administradores.
+- Python 
+- Django
+- PostgreSQL
+- HTML + CSS (admin)
+- BPMN IO (modelagem de processos)
+- Figma (Protótipos de tela)
+- Lucidchart (Diagrama de casos de uso)
+- Mermaid Chart (Diagrama de Classe)
 
-Diferente de soluções convencionais que utilizam controle manual ou sistemas desconectados, o ParkControl permite uma gestão integrada e digitalizada, aumentando a eficiência operacional dos estacionamentos.
+## 📄 Documentação
 
-## Colaboradores:
+A documentação completa do sistema está disponível na pasta [`DOC/`](./DOC), contendo:
+
+- Casos de uso
+- Diagrama de classes
+- Diagramas BPMN dos processos
+- Protótipos de Tela
+- Visão geral do produto
+
+## 🧑‍💻 Autores:
+
 - [Emmylly Maria](https://github.com/emmyllydev)
 - [Fábio Júnior](https://github.com/Fabio-jr-SM)
 - [Filomena Soares](https://github.com/filomenasoares)
 - [Karla Viethia](https://github.com/belokarla7)
 - [Maria Clara](https://github.com/Giraldellis)
 - [Pedro Lucas](https://github.com/pedrolucasS86)
+
+
+## 📚 Licença
+
+Este projeto é acadêmico e não possui licença comercial.
