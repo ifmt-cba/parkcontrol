@@ -11,7 +11,7 @@
 | Acessa o menu de administração.        | Exibe as opções de gerenciamento. *(RI01)*                                                               |
 | Seleciona "Gerenciar Planos Diaristas". | Lista os planos existentes. *(RI01)*                                                                     |
 | Clica em "Novo Plano".                  | Exibe o formulário de cadastro. *(RI02)*                                                                 |
-| Preenche dados do plano (nome, valor diário, validade, etc) e confirma. | Valida e salva o plano no sistema. *(RN01, RN03, EX01, AL02, RI02, RI03)*          |
+| Preenche dados do plano (nome, valor diário, validade, etc) e confirma. | Valida e salva o plano no sistema. *(RN01, RN02, RN03, EX01, AL02, RI02, RI03)*          |
 | Cancelar ação de cadastro.              | Retorna à tela inicial sem salvar. *(AL01)*                                                              |
 
 | *Exceções*                                                                                             |
@@ -41,5 +41,5 @@
 | nome          | Texto        | ^[A-Za-z0-9\s]{3,50}$ | -           | Nome do plano. Obrigatório.                                            |
 | valor_diario  | Decimal (R$) | ^\d{1,5}(\,\d{2})?$ | 99999,99      | Valor por diária. Obrigatório.                                          |
 | validade      | Número inteiro | ^\d{1,3}$        | -             | Validade do plano em dias. Obrigatório.                                |
-| status        | Booleano     | ^(ativo|inativo)$ | -             | Indica se o plano está ativo.                                           |
+| status        | Booleano     | ^(ativo\|inativo)$ | -             | Indica se o plano está ativo.                                           |
 | descricao     | Texto Longo  | .*                | -             | Descrição adicional do plano (opcional).                               |
