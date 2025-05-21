@@ -1,0 +1,15 @@
+# Framework principal
+Django>=4.2,<5.0
+
+# Leitura segura de variáveis de ambiente (.env)
+python-decouple>=3.8
+
+# Para futuras melhorias e relatórios (opcional)
+xhtml2pdf>=0.2.8
+
+# Ferramentas de desenvolvimento (opcional)
+black>=24.3.0
+flake8>=6.1.0
+
+# Suporte a datas e fusos horários
+pytz>=2024.1
