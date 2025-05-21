@@ -8,9 +8,9 @@
 | *Interação entre Ator e Sistema*       |                                                                                                         |
 |----------------------------------------|---------------------------------------------------------------------------------------------------------|
 | *Ator*                                 | *Sistema*                                                                                               |
-| Acessa o menu de administração.        | Exibe opções de gerenciamento. *(RI01)*                                                                 |
-| Seleciona "Gerenciar Planos Diaristas". | Lista todos os planos disponíveis. *(RI01)*                                                             |
-| Visualiza detalhes dos planos.          | Exibe informações como nome, valor, validade e status. *(RI02)*                                          |
+| Acessa o menu de administração.        | Exibe opções de gerenciamento. *(AL01, RI01, RI02, RN01)*                                                                 |
+| Seleciona "Gerenciar Planos Diaristas". | Lista todos os planos disponíveis. *(RI01, EX01)*                                                             |
+| Visualiza detalhes dos planos.          | Exibe informações como nome, valor, validade e status. *(RI02, RN02)*                                          |
 
 | *Exceções*                                                                                             |
 |--------------------------------------------------------------------------------------------------------|
@@ -35,5 +35,5 @@
 | nome          | Texto        | ^[A-Za-z0-9\s]{3,50}$ | -           | Nome do plano.                                                         |
 | valor_diario  | Decimal (R$) | ^\d{1,5}(\,\d{2})?$ | 99999,99      | Valor por diária.                                                      |
 | validade      | Número inteiro | ^\d{1,3}$        | -             | Validade em dias.                                                      |
-| status        | Booleano     | ^(ativo|inativo)$ | -             | Indica se o plano está ativo.                                           |
+| status        | Booleano     | ^(ativo\|inativo)$ | -             | Indica se o plano está ativo.                                           |
 | descricao     | Texto Longo  | .*                | -             | Informações adicionais sobre o plano.                                 |
