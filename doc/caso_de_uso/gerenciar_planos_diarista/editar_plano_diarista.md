@@ -10,7 +10,7 @@
 | *Ator*                                 | *Sistema*                                                                                               |
 | Acessa o menu de administração.        | Exibe opções de gerenciamento. *(RI01)*                                                                 |
 | Seleciona "Gerenciar Planos Diaristas". | Lista os planos disponíveis. *(RI01)*                                                                   |
-| Clica em "Editar" no plano desejado.    | Carrega o formulário com dados atuais. *(RI02)*                                                         |
+| Clica em "Editar" no plano desejado.    | Carrega o formulário com dados atuais. *(EX02, RI02)*                                                         |
 | Altera os dados e confirma.             | Valida e atualiza o plano no sistema. *(RN01, RN02, RN03, EX01, RI02, RI03)*                             |
 
 | *Exceções*                                                                                             |
@@ -39,5 +39,5 @@
 | nome          | Texto        | ^[A-Za-z0-9\s]{3,50}$ | -           | Nome do plano. Obrigatório.                                            |
 | valor_diario  | Decimal (R$) | ^\d{1,5}(\,\d{2})?$ | 99999,99      | Valor por diária. Obrigatório.                                          |
 | validade      | Número inteiro | ^\d{1,3}$        | -             | Validade do plano em dias. Obrigatório.                                |
-| status        | Booleano     | ^(ativo|inativo)$ | -             | Indica se o plano está ativo.                                           |
+| status        | Booleano     | ^(ativo\|inativo)$ | -             | Indica se o plano está ativo.                                           |
 | descricao     | Texto Longo  | .*                | -             | Descrição adicional do plano (opcional).                               |
