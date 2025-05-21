@@ -11,7 +11,7 @@
 | Acessa o menu de administração.        | Exibe as opções de gerenciamento. *(RI01)*|
 | Seleciona a opção "Gerenciar Planos". | Carrega a tela com os planos cadastrados. *(RI01)*|
 | Clica em "Novo Plano".                 | Exibe o formulário para cadastro de plano. *(RI02)*|
-| Preenche os dados do plano e confirma. | Valida os dados e salva o novo plano no sistema. *(RN01, RN03, EX01, AL01, RI02, RI03)*|
+| Preenche os dados do plano e confirma. | Valida os dados e salva o novo plano no sistema. *(RN01, RN03, EX01, EX02, AL01, RI02, RI03)*|
 | Cancela o cadastro.                   | O sistema retorna à tela de gerenciamento de planos. *(AL02)*|
 
 | *Exceções*                                                                                      |
@@ -27,8 +27,7 @@
 | *Regras de Negócio*                                                                                   |
 |--------------------------------------------------------------------------------------------------------|
 | RN01 - Todo plano deve possuir um nome único e valor definido.                                         |
-| RN02 - O valor do plano deve ser um número positivo com duas casas decimais.                          |
-| RN03 - O sistema deve armazenar a data de criação e a última alteração do plano.                      |
+| RN02 - O sistema deve armazenar a data de criação e a última alteração do plano.                      |
 
 | *Requisitos de Interface com o Usuário*                                                               |
 |--------------------------------------------------------------------------------------------------------|
@@ -43,7 +42,7 @@
 | tipo          | Texto        | ^(Mensal|Anual|Semestral)$ | -     | Tipo do plano (Mensal, Anual, Semestral). Obrigatório.                       |
 | validade      | Número inteiro | ^\d{1,3}$        | -             | Duração do plano em dias. Obrigatório. Deve ser maior que 0.               |
 | descrição     | Texto Longo  | .*                | -             | Campo opcional para descrição adicional do plano. Sem restrições rígidas.  |
-| status        | Booleano     | ^(ativo|inativo)$ | -             | Indica se o plano está ativo ou não. Controle de exclusão lógica.           |
-| data_criacao  | Data         | ^\d{4}-\d{2}-\d{2}$ | dd/mm/aaaa   | Data em que o plano foi cadastrado. Gerado automaticamente pelo sistema.   |
-| ultima_alteracao | DataHora | ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$ | dd/mm/aaaa hh:mm:ss | Data e hora da última edição. Gerado automaticamente. |
+| status        | Booleano     | ^(ativo \| inativo)$| -             | Indica se o plano está ativo ou não. Controle de exclusão lógica.           |
+| data_criacao  | Data         | ^\d{2}-\d{2}-\d{4}$ | dd/mm/aaaa   | Data em que o plano foi cadastrado. Gerado automaticamente pelo sistema.   |
+| ultima_alteracao | DataHora | ^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$ | dd/mm/aaaa hh:mm:ss | Data e hora da última edição. Gerado automaticamente. |
 | criado_por    | Texto        | ^[A-Za-z0-9]{3,30}$ | -           | Identificador do usuário que criou o plano. Registrado automaticamente.    |
