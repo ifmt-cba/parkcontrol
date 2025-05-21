@@ -11,7 +11,7 @@
 | Acessa o menu de administração.        | Exibe opções de gerenciamento. *(RI01)*                                                                 |
 | Seleciona "Gerenciar Planos Diaristas". | Lista todos os planos disponíveis. *(RI01)*                                                             |
 | Clica em "Excluir" no plano desejado.   | Solicita confirmação da ação. *(RI02)*                                                                  |
-| Confirma a exclusão.                    | Remove o plano do sistema. *(RN01, EX01)*                                                               |
+| Confirma a exclusão.                    | Remove o plano do sistema. *(RN01, EX01, RI03)*                                                               |
 
 | *Exceções*                                                                                             |
 |--------------------------------------------------------------------------------------------------------|
@@ -38,5 +38,5 @@
 | nome          | Texto        | ^[A-Za-z0-9\s]{3,50}$ | -           | Nome do plano.                                                         |
 | valor_diario  | Decimal (R$) | ^\d{1,5}(\,\d{2})?$ | 99999,99      | Valor por diária.                                                      |
 | validade      | Número inteiro | ^\d{1,3}$        | -             | Validade em dias.                                                      |
-| status        | Booleano     | ^(ativo|inativo)$ | -             | Indica se o plano está ativo.                                           |
+| status        | Booleano     | ^(ativo\|inativo)$| -             | Indica se o plano está ativo.                                           |
 | descricao     | Texto Longo  | .*                | -             | Informações adicionais sobre o plano.                                 |
