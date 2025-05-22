@@ -3,12 +3,11 @@ version: '3.9'
 services:
   web:
     build:
-      context: ./parkcontrol
-      dockerfile: ../Dockerfile
+      context: .
     container_name: parkcontrol_web
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python parkcontrol/manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./parkcontrol:/app
+      - .:/app
     ports:
       - "8000:8000"
     env_file:

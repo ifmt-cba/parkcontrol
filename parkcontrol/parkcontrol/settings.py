@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-+=0s*mo_^)l^psebmk$9yww0o9wn%*2q%ift)1w*^+_45^(1mh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "*",
+]
 
 
 # Application definition
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     # Apps da aplicação
     'apps.clientes',
     'apps.core',  
-    'apps.frentista',
+    'apps.frentistas',
     'apps.usuarios',
     'apps.manutencao',
     'apps.pagamentos',
