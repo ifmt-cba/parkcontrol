@@ -1,8 +1,4 @@
-Perfeito! Aqui está um `README.md` completo e profissional para orientar **outros desenvolvedores** da sua equipe a configurar e rodar o projeto **ParkControl** com Docker:
 
----
-
-````md
 # 🚗 ParkControl
 
 Sistema de gestão de estacionamento, desenvolvido em Django.
@@ -188,4 +184,3 @@ Ou, para outras tarefas como criar um superuser:
 docker exec -it parkcontrol_web python parkcontrol/manage.py createsuperuser
 ```
 
----
