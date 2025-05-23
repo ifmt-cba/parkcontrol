@@ -24,7 +24,7 @@ def login_parkcontrol(request):
             return redirect('home_parkcontrol') # Redirect to home page after login
     else:
         # If the request method is GET, render the login page
-        return render(request, 'usuarios/login.html') 
+        return render(request, 'autenticacao/login.html') 
 
 #Registration page
 def register_parkcontrol(request):
@@ -39,7 +39,7 @@ def register_parkcontrol(request):
         user = User.objects.filter(username=username).first()
 
         if user:
-            return render(request, 'usuarios/register.html')
+            return render(request, 'autenticacao/register.html')
         
         # Create a new user
         user = User.objects.create_user(username=username, email=email, password=password, first_name=first_name)
@@ -47,15 +47,14 @@ def register_parkcontrol(request):
         return redirect('register_parkcontrol') # Redirect to login page after registration
     else: 
         # If the request method is GET, render the registration page
-        return render(request, 'usuarios/register.html')
+        return render(request, 'autenticacao/register.html')
 
 # Logout page
 def logout_parkcontrol(request):
     logout(request)    
-    return render(request, 'usuarios/logout.html')
+    return render(request, 'autenticacao/logout.html')
 
 
 @login_required(login_url='login_parkcontrol') # Decorator to require login
-# Home page
 def home_parkcontrol(request):
-    return render(request, 'usuarios/home.html')
+    return render(request, 'usuarios/administrador/dashboard_administrador.html')
