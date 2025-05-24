@@ -13,10 +13,24 @@ def redirect_to_login(request):
 
 '''
 
-    AUTENTICATION 
+    USER ACCESS CONTROL
+
+'''
+def is_administrador(user):
+    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Administrador'
+
+def is_contador(user):
+    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Contador'
+
+def is_frentista(user):
+    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Frentista'
+
 
 '''
 
+    AUTENTICATION 
+
+'''
 # Login page
 def login_parkcontrol(request):
 
@@ -50,6 +64,8 @@ def login_parkcontrol(request):
         return render(request, 'autenticacao/login.html') 
 
 #Registration page
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_administrador, login_url='login_parkcontrol')
 def register_parkcontrol(request):
     # Check if the user is already authenticated
     if request.method == 'POST':
@@ -76,23 +92,6 @@ def register_parkcontrol(request):
 def logout_parkcontrol(request):
     logout(request)    
     return render(request, 'autenticacao/logout.html')
-
-
-'''
-
-    USER ACCESS CONTROL
-
-'''
-
-def is_administrador(user):
-    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Administrador'
-
-def is_contador(user):
-    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Contador'
-
-def is_frentista(user):
-    return user.is_authenticated and getattr(user, 'perfil_acesso', None) == 'Frentista'
-
 
 
 '''
