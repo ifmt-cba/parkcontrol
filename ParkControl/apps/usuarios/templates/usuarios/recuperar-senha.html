@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Recuperação de Senha</title>
+  <link rel="stylesheet" href="{% static 'usuarios/css/recuperar-senha.css' %}">
+</head>
+<body>
+  <h1>REDEFINIÇÃO DE SENHA DE ACESSO</h1>
+
+  <form method="POST" action="{% url 'recuperar_senha' %}">
+    {% csrf_token %}
+    <label for="email">E-mail</label>
+    <input type="email" name="email" id="email" required>
+
+    <label for="nome">Nome</label>
+    <input type="text" name="nome" id="nome" required>
+
+    <div class="btn-group">
+      <button type="button" onclick="window.history.back()">Voltar</button>
+      <button type="submit">Encaminhar Senha</button>
+    </div>
+
+    {% if mensagem %}
+      <p class="mensagem {{ status }}">{{ mensagem }}</p>
+    {% endif %}
+  </form>
+</body>
+</html>
