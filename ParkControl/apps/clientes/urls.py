@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'clientes'  # Define o namespace para o app clientes
+
 urlpatterns = [
     path('cadastrar/', views.cadastrar_clientes_view, name='cadastrar_cliente'),
     path('mensalista/', views.cadastro_mensalistas_view, name='cadastro_mensalista'),

@@ -29,7 +29,7 @@
         <h1 class="text-danger fw-bold mb-5">Editar Clientes Mensalistas</h1>
 
         <div class="form-container-wrapper">
-            <form action="{% url 'editar_mensalista' pk=mensalista.pk %}" method="POST">
+            <form action="{% url 'clientes:editar_mensalista' pk=mensalista.pk %}" method="POST">
                 {% csrf_token %}
                 <div class="row g-4">
                     <div class="col-md-6">
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-5">
-                    <a href="{% url 'cliente_mensalista' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+                    <a href="{% url 'clientes:cliente_mensalista' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
                     <button type="submit" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Atualizar</button>
                 </div>
             </form>

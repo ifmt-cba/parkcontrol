@@ -11,7 +11,7 @@
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
             <h2 class="text-center mb-4">Registrar Usuário</h2>
-            <form action="{% url 'register_parkcontrol' %}" method="post">
+            <form action="{% url 'usuarios:register_parkcontrol' %}" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="username" class="form-label">Usuário/Matrícula</label>

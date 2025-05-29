@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import user_passes_test # Import user_passes
 
 # Redirect to login page
 def redirect_to_login(request):
-    return redirect('login_parkcontrol')  
+    return redirect('usuarios:login_parkcontrol')  
 
 '''
 
@@ -48,14 +48,14 @@ def login_parkcontrol(request):
             perfil = getattr(user, 'perfil_acesso', None)
 
             if perfil == 'Administrador':
-                return redirect('dashboard_administrador')
+                return redirect('usuarios:dashboard_administrador')
             elif perfil == 'Frentista':
-                return redirect('dashboard_frentista')
+                return redirect('usuarios:dashboard_frentista')
             elif perfil == 'Contador':
-                return redirect('dashboard_contador')
+                return redirect('usuarios:dashboard_contador')
             else:
                 messages.warning(request, 'Perfil de acesso não identificado.')
-                return redirect('login_parkcontrol')
+                return redirect('usuarios:login_parkcontrol')
         else:
             messages.error(request, 'E-mail ou senha inválidos.')
             return render(request, 'autenticacao/login.html')

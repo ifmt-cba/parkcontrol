@@ -37,7 +37,7 @@
           {% endfor %}
         {% endif %}
 
-        <form method="post" class="w-100" action="{% url 'login_parkcontrol' %}">{% csrf_token %}
+        <form method="post" class="w-100" action="{% url 'usuarios:login_parkcontrol' %}">{% csrf_token %}
           <div class="mb-3">
             <label for="username" class="text-muted">Usuário</label>
             <input type="text" placeholder="Usuário" class="form-control" id="username" name="username" required>
