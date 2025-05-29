@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}ParkControl{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>ParkControl</h1>
+        {% block header %}{% endblock %}
+    </header>
+    <nav>
+        {% block nav %}{% endblock %}
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; {{ year|default:"2024" }} ParkControl</p>
+        {% block footer %}{% endblock %}
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
