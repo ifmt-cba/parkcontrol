@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form.instance.pk|yesno:"Editar Plano Diário, Criar Plano Diário" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 p-4 border rounded shadow-sm">
+    <h1 class="mb-4" style="color: #E41515;">
+        {{ form.instance.pk|yesno:"Editar Plano Diário, Criar Plano Diário" }}
+    </h1>
+
+    <form method="post" class="needs-validation">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.validade.label_tag }}
+            {{ form.validade }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.descricao.label_tag }}
+            {{ form.descricao }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.status.label_tag }}
+            {{ form.status }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.valor_diaria.label_tag }}
+            {{ form.valor_diaria }}
+        </div>
+
+        <button type="submit" class="btn btn-outline-danger">Salvar</button>
+        <a href="{% url 'listar_planos_diarios' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+
+{% endblock %}
