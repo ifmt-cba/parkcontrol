@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Visualizar Plano Mensal{% endblock %}
+
+{% block content %}
+<div class="container mt-5 p-4 border border-danger rounded shadow-sm">
+    <h1 class="mb-4" style="color: #E41515;">Plano Mensal: {{ plano.nome }}</h1>
+
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Validade:</strong> {{ plano.validade }}</li>
+        <li class="list-group-item"><strong>Tipo:</strong> {{ plano.tipo_plano }}</li>
+        <li class="list-group-item"><strong>Descrição:</strong> {{ plano.descricao }}</li>
+    </ul>
+
+    <a href="{% url 'listar_planos_mensais' %}" class="btn btn-outline-danger mt-4">← Voltar</a>
+</div>
+{% endblock %}
