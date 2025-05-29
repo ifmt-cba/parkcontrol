@@ -10,6 +10,6 @@
 <form method="post">
   {% csrf_token %}
   <button type="submit" class="btn btn-danger">Sim, excluir</button>
-  <a href="{% url 'listar_planos_diarios' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+  <a href="{% url 'planos:listar_planos_diarios' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
 </form>
 {% endblock %}
