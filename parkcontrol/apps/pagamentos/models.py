@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from core.models import Usuario
+from apps.usuarios.models import Usuario
 from decimal import Decimal
 import math
 
