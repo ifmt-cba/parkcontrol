@@ -1,46 +1,22 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Página Inicial</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome para ícones -->
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
-        <div class="container-fluid">
-            <!-- Imagem/Logo à esquerda -->
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="{% static "images/logo-branca.png" %}" alt="Logo" class="me-2" style="height: 40px;">
-            </a>
+{% block title %}Página Inicial - Frentista{% endblock %}
 
-            <!-- Direita: tipo de usuário + ícone + botão sair -->
-            <div class="d-flex align-items-center">
-                <span class="text-white me-3 d-flex align-items-center">
-                    <i class="fas fa-user me-1"></i> Frentista
-                </span>
-                <a class="btn btn-outline-light btn-sm" href="{% url 'usuarios:logout_parkcontrol' %}">Sair</a>
-            </div>
-        </div>
-    </nav>
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4 mb-2 text-danger fw-bold">Frentista</h1>
 
-    <div class="container mt-5">
-        <h1 class="display-4 mb-2 text-danger fw-bold">Frentista</h1>
-        <div class="d-flex flex-wrap gap-3 my-4">
-            <a href="#" class="btn btn-danger btn-lg flex-fill">
-                <i class="fas fa-file-alt me-2"></i> Gerência Cobranças Diárias
-            </a>
-            <a href="#" class="btn btn-danger btn-lg flex-fill">
-                <i class="fas fa-users-cog me-2"></i> Gerência de Vagas
-            </a>
-            <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger btn-lg flex-fill">
-                <i class="fas fa-users-cog me-2"></i> Gerência de Clientes
-            </a>
-
-
-        </div>
+    <div class="d-flex flex-wrap gap-3 my-4">
+        <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-file-alt me-2"></i> Gerência Cobranças Diárias
+        </a>
+        <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-users-cog me-2"></i> Gerência de Vagas
+        </a>
+        <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-users-cog me-2"></i> Gerência de Clientes
+        </a>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

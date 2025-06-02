@@ -35,7 +35,7 @@ def criar_plano_mensal(request):
                 return render(request, 'planos/mensais/criar_plano_mensal.html', {'form': form})
             plano.tipo_mensal = tipo_mensal
             plano.save()
-            return redirect('listar_planos_mensais')
+            return redirect('planos:listar_planos_mensais')
     else:
         form = PlanoMensalForm()
     return render(request, 'planos/mensais/criar_plano_mensal.html', {'form': form})
@@ -48,7 +48,7 @@ def criar_plano_diario(request):
             plano = form.save(commit=False)
             plano.tipo_plano = 'Diarista'
             plano.save()
-            return redirect('listar_planos_diarios')
+            return redirect('planos:listar_planos_diarios')
     else:
         form = PlanoDiarioForm()
     return render(request, 'planos/diarios/criar_plano_diario.html', {'form': form})
@@ -63,7 +63,7 @@ def editar_plano_mensal(request, id):
         form = PlanoMensalForm(request.POST, instance=plano)
         if form.is_valid():
             form.save()
-            return redirect('listar_planos_mensais')
+            return redirect('planos:listar_planos_mensais')
     else:
         form = PlanoMensalForm(instance=plano)
     return render(request, 'planos/mensais/editar_plano_mensal.html', {'form': form, 'plano': plano})
@@ -75,7 +75,7 @@ def editar_plano_diario(request, id):
         form = PlanoDiarioForm(request.POST, instance=plano)
         if form.is_valid():
             form.save()
-            return redirect('listar_planos_diarios')
+            return redirect('planos:listar_planos_diarios')
     else:
         form = PlanoDiarioForm(instance=plano)
     return render(request, 'planos/diarios/editar_plano_diario.html', {'form': form, 'plano': plano})
@@ -99,7 +99,7 @@ def excluir_plano_mensal(request, id):
     plano = get_object_or_404(Planos, id=id, tipo_plano='Mensalista')
     if request.method == 'POST':
         plano.delete()
-        return redirect('listar_planos_mensais')
+        return redirect('planos:listar_planos_mensais')
     return render(request, 'planos/mensais/excluir_plano_mensal.html', {'plano': plano})
 
 @login_required
@@ -107,7 +107,7 @@ def excluir_plano_diario(request, id):
     plano = get_object_or_404(Planos, id=id, tipo_plano='Diarista')
     if request.method == 'POST':
         plano.delete()
-        return redirect('listar_planos_diarios')
+        return redirect('planos:listar_planos_diarios')
     return render(request, 'planos/diarios/excluir_plano_diario.html', {'plano': plano})
 
  

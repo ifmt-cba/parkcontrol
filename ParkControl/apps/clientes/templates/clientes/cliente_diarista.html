@@ -1,90 +1,80 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Clientes Diaristas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'clientes/css/cliente_diarista.css' %}">
-</head>
-<body>
 
-    <!-- Cabeçalho -->
-    <header class="bg-danger py-2 px-4 d-flex justify-content-center">
-        <img src="{% static 'clientes/img/logo.png' %}" alt="Logo" style="height: 40px;">
-    </header>
+{% block title %}Clientes Diaristas{% endblock %}
 
-    <!-- Conteúdo principal -->
-    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
-        <h1 class="text-danger fw-bold mb-5">Clientes Diaristas</h1>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'clientes/css/cliente_diarista.css' %}">
+{% endblock %}
 
-        <!-- Filtros -->
-        <div class="container mt-4">
-            <form method="GET" class="row g-2 mb-4 justify-content-center">
-                <div class="col-md-4">
-                    <input type="text" name="nome" class="form-control" placeholder="Buscar por nome" value="{{ request.GET.nome }}">
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="placa" class="form-control" placeholder="Buscar por placa" value="{{ request.GET.placa }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn bg-danger-subtle w-100">Filtrar</button>
-                </div>
-            </form>
+{% block content %}
+<main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+    <h1 class="text-danger fw-bold mb-5">Clientes Diaristas</h1>
 
-            <!-- Quantidade de clientes encontrados -->
-            <p class="text-center fw-bold">
-                {{ diaristas|length }} cliente{{ diaristas|length|pluralize }} encontrado{{ diaristas|length|pluralize }}
-            </p>
+    <!-- Filtros -->
+    <div class="container mt-4">
+        <form method="GET" class="row g-2 mb-4 justify-content-center">
+            <div class="col-md-4">
+                <input type="text" name="nome" class="form-control" placeholder="Buscar por nome" value="{{ request.GET.nome }}">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="placa" class="form-control" placeholder="Buscar por placa" value="{{ request.GET.placa }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn bg-danger-subtle w-100">Filtrar</button>
+            </div>
+        </form>
+
+        <!-- Quantidade de clientes encontrados -->
+        <p class="text-center fw-bold">
+            {{ diaristas|length }} cliente{{ diaristas|length|pluralize }} encontrado{{ diaristas|length|pluralize }}
+        </p>
 
         <!-- Tabela -->
-            <div class="table-responsive">
-                {% if diaristas %}
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table-danger">
-                        <tr>
-                            <th>Nome</th>
-                            <th>Telefone</th>
-                            <th>Placa</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cliente in diaristas %}
-                        <tr>
-                            <td data-label="Nome">{{ cliente.nome }}</td>
-                            <td data-label="Telefone">{{ cliente.telefone }}</td>
-                            <td data-label="Placa">{{ cliente.placa }}</td>
-                            <td data-label="Status">
-                                {% if cliente.ativo %}
-                                    <span class="badge bg-success">Ativo</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">Inativo</span>
-                                {% endif %}
-                            </td>
-                            <td data-label="Ações">
-                                <a href="{% url 'clientes:editar_diarista' pk=cliente.pk %}" class="btn btn-outline-danger btn-sm">Editar</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6">Nenhum cliente encontrado.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %} 
-                <p class="text-center fw-bold text-muted">Nenhum cliente encontrado.</p> {% endif %}
-            </div>
+        <div class="table-responsive">
+            {% if diaristas %}
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Placa</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in diaristas %}
+                    <tr>
+                        <td>{{ cliente.nome }}</td>
+                        <td>{{ cliente.telefone }}</td>
+                        <td>{{ cliente.placa }}</td>
+                        <td>
+                            {% if cliente.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'clientes:editar_diarista' pk=cliente.pk %}" class="btn btn-outline-danger btn-sm">Editar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">Nenhum cliente encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-center fw-bold text-muted">Nenhum cliente encontrado.</p>
+            {% endif %}
         </div>
-    </main>
+    </div>
+</main>
 
-        <!-- Botão Voltar -->
-    <footer class="text-center mt-4">
-        <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<footer class="text-center mt-4">
+    <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+</footer>
+{% endblock %}
