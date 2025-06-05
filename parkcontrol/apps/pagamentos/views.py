@@ -71,43 +71,6 @@ def registrar_pagamento_diarista(request, cobranca_id):
     
     return render(request, 'pagamentos/registrar_pagamento_diarista.html', {'cobranca': cobranca})
 
-def gerar_pagamentos_mensalistas_manual(request):
-    """
-    Gerar Pagamentos Mensalistas (manual pelo contador).
-    """
-    if request.method == 'POST':
-        form = GerarCobrancaMensalForm(request.POST)
-        if form.is_valid():
-            cliente_mensalista = form.cleaned_data['cliente_mensalista']
-            mes_referencia_str = form.cleaned_data['mes_referencia']
-            data_vencimento = form.cleaned_data['data_vencimento']
-            valor_devido = form.cleaned_data['valor_devido']
-
-            with transaction.atomic():
-                CobrancaMensalista.objects.create(
-                    cliente_mensalista=cliente_mensalista,
-                    mes_referencia=mes_referencia_str,
-                    data_vencimento=data_vencimento,
-                    valor_devido=valor_devido,
-                    status='pendente',
-                )
-                messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista.usuario.get_full_name()} referente a {mes_referencia_str}.")
-            return redirect('pagamentos:listar_cobrancas_mensalistas')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    field_name = form[field].label or field
-                    messages.error(request, f"Erro no campo '{field_name}': {error}")
-            return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', {'form': form})
-    else:
-        form = GerarCobrancaMensalForm()
-
-    context = {
-        'form': form,
-    }
-    return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
-
-
 # --- Views para Contador (Gerenciamento de Pagamentos) ---
 
 
@@ -117,40 +80,49 @@ def gerenciamento_pagamentos_home(request):
     """
     return render(request, 'pagamentos/gerenciamento_pagamentos_home.html')
 
-def listar_clientes_ativos(request):
+def gerar_pagamentos_mensalistas_lista_clientes(request):
     """
-    Lista clientes/cobranças consideradas ativas.
-    Exemplo: lista cobranças pendentes de diaristas e mensalistas.
+    Lista clientes mensalistas ativos para que o contador possa gerar cobranças para eles.
+    Corresponde à tela "Clientes Ativos" do anexo, mas com foco na GERAÇÃO.
     """
-    
-    cobrancas_diaristas_pendentes = CobrancaDiarista.objects.filter(status='pendente').order_by('-data_geracao')
-    cobrancas_mensalistas_pendentes = CobrancaMensalista.objects.filter(status='pendente').order_by('-data_geracao')
-    
-    lista_para_template = []
+    query_nome = request.GET.get('nome_cliente', '').strip()
+    query_placa = request.GET.get('placa_veiculo', '').strip()
+    status_filter = request.GET.get('status', 'ativo').strip() # Default para 'ativo'
 
-    for cobranca_d in cobrancas_diaristas_pendentes:
-        lista_para_template.append({
-            'id': cobranca_d.id,
-            'nome_ou_identificador': f"Diarista: {cobranca_d.movimento.placa_veiculo if cobranca_d.movimento else 'N/D'} (ID: {cobranca_d.id})",
-            'status_pagamento': cobranca_d.get_status_display(),
-            'tipo_cliente': 'Diarista',
-            'tipo_cobranca_url': 'diarista'
-        })
+    clientes = ClienteMensalista.objects.select_related('usuario', 'plano').all()
 
-    for cobranca_m in cobrancas_mensalistas_pendentes:
-        lista_para_template.append({
-            'id': cobranca_m.id,
-            'nome_ou_identificador': f"Mensalista: {cobranca_m.cliente_mensalista.usuario.get_full_name() if cobranca_m.cliente_mensalista and cobranca_m.cliente_mensalista.usuario else 'N/D'} (ID: {cobranca_m.id})",
-            'status_pagamento': cobranca_m.get_status_display(),
-            'tipo_cliente': 'Mensalista',
-            'tipo_cobranca_url': 'mensalista'
-        })
+    if status_filter == 'ativo':
+        clientes = clientes.filter(ativo=True)
+    elif status_filter == 'inativo':
+        clientes = clientes.filter(ativo=False)
+    # Se 'todos', não filtra por ativo/inativo
+
+    if query_nome:
+        clientes = clientes.filter(
+            Q(usuario__first_name__icontains=query_nome) |
+            Q(usuario__last_name__icontains=query_nome) |
+            Q(usuario__username__icontains=query_nome)
+        )
+    if query_placa:
+        messages.warning(request, "A busca por placa ainda não está implementada para mensalistas. Por favor, ajuste o código.")
+        pass 
+
+    paginator = Paginator(clientes, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if not page_obj.object_list and (query_nome or query_placa or status_filter != 'ativo'):
+        messages.info(request, "Nenhum cliente mensalista encontrado com os filtros informados.")
 
     context = {
-        'clientes': lista_para_template,
-        'titulo_pagina': 'Clientes Ativos / Cobranças Pendentes'
+        'page_obj': page_obj,
+        'query_nome': query_nome,
+        'query_placa': query_placa,
+        'status_filter': status_filter,
+        'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')],
+        'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
     }
-    return render(request, 'gerar_pagamentos/listar_clientes_ativos.html', context)
+    return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html', context)
 
 def listagem_pagamentos_geral_redirect(request):
     """
@@ -158,43 +130,51 @@ def listagem_pagamentos_geral_redirect(request):
     """
     return redirect('pagamentos:listar_cobrancas_mensalistas') 
 
-def gerar_pagamentos_mensalistas_manual(request):
+def gerar_pagamentos_mensalistas_manual(request, cliente_id=None): 
     """
     Gerar Pagamentos Mensalistas (manual pelo contador).
+    Pode receber um cliente_id para pré-preencher o formulário.
     """
+    initial_data = {}
+    if cliente_id:
+        cliente_mensalista = get_object_or_404(ClienteMensalista, id=cliente_id)
+        initial_data['cliente_mensalista'] = cliente_mensalista
+        if cliente_mensalista.plano:
+            initial_data['valor_devido'] = cliente_mensalista.plano.valor_mensal
+        
+        # Pre-preenche mês de referência para o mês atual
+        today = timezone.now().date()
+        initial_data['mes_referencia'] = today.strftime('%m/%Y')
+
     if request.method == 'POST':
         form = GerarCobrancaMensalForm(request.POST)
         if form.is_valid():
-            cliente_mensalista = form.cleaned_data['cliente_mensalista']
+            cliente_mensalista_form = form.cleaned_data['cliente_mensalista'] # Renomeado para evitar conflito
             mes_referencia_str = form.cleaned_data['mes_referencia']
             data_vencimento = form.cleaned_data['data_vencimento']
             valor_devido = form.cleaned_data['valor_devido']
 
             with transaction.atomic():
                 CobrancaMensalista.objects.create(
-                    cliente_mensalista=cliente_mensalista,
+                    cliente_mensalista=cliente_mensalista_form, # Usar o do form
                     mes_referencia=mes_referencia_str,
                     data_vencimento=data_vencimento,
                     valor_devido=valor_devido,
                     status='pendente',
                 )
-                messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista.usuario.get_full_name()} referente a {mes_referencia_str}.")
+                messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_form.usuario.get_full_name()} referente a {mes_referencia_str}.")
             return redirect('pagamentos:listar_cobrancas_mensalistas')
         else:
-
             for field, errors in form.errors.items():
                 for error in errors:
                     field_name = form[field].label or field
                     messages.error(request, f"Erro no campo '{field_name}': {error}")
-
-            return render(request, 'pagamentos/gerar_pagamentos_mensalistas_manual.html', {'form': form})
+            return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', {'form': form})
     else:
-        form = GerarCobrancaMensalForm()
+        form = GerarCobrancaMensalForm(initial=initial_data)
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'pagamentos/gerar_pagamentos_mensalistas_manual.html', context)
+    context = {'form': form}
+    return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
 
 def detalhe_cobranca_diarista(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
