@@ -8,10 +8,29 @@ from django.contrib import messages
 @login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador, login_url='login_parkcontrol')
 def gerencia_usuarios(request):
-    usuarios = Usuario.objects.all().order_by('id')  # busca todos os usuários
+    usuarios = Usuario.objects.all().order_by('id')
+
+    # Filtros
+    search_nome = request.GET.get('nome')
+    search_email = request.GET.get('email')
+    filtro_perfil = request.GET.get('perfil')
+
+    if search_nome:
+        usuarios = usuarios.filter(first_name__icontains=search_nome)
+
+    if search_email:
+        usuarios = usuarios.filter(email__icontains=search_email)
+
+    if filtro_perfil and filtro_perfil != 'Todos':
+        usuarios = usuarios.filter(perfil_acesso=filtro_perfil)
+
     return render(request, 'usuarios/administrador/gerencia_usuario.html', {
-        'usuarios': usuarios
+        'usuarios': usuarios,
+        'search_nome': search_nome,
+        'search_email': search_email,
+        'filtro_perfil': filtro_perfil,
     })
+
 
 
 @login_required(login_url='login_parkcontrol')
@@ -40,3 +59,36 @@ def register_parkcontrol(request):
         return redirect('gerencia_usuarios')
 
     return render(request, 'usuarios/administrador/register.html')
+
+
+
+
+# EDITAR USUÁRIO
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_administrador, login_url='login_parkcontrol')
+def editar_usuario(request, usuario_id):
+    usuario = Usuario.objects.get(id=usuario_id)
+
+    if request.method == 'POST':
+        usuario.username = request.POST.get('username')
+        usuario.email = request.POST.get('email')
+        usuario.first_name = request.POST.get('first_name')
+        usuario.perfil_acesso = request.POST.get('perfil_acesso')
+
+        usuario.save()
+        messages.success(request, f"Usuário {usuario.first_name} atualizado com sucesso!")
+        return redirect('gerencia_usuarios')
+
+    return render(request, 'usuarios/administrador/editar_usuario.html', {
+        'usuario': usuario
+    })
+
+
+# EXCLUIR USUÁRIO
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_administrador, login_url='login_parkcontrol')
+def excluir_usuario(request, usuario_id):
+    usuario = Usuario.objects.get(id=usuario_id)
+    usuario.delete()
+    messages.success(request, f"Usuário {usuario.first_name} excluído com sucesso!")
+    return redirect('gerencia_usuarios')

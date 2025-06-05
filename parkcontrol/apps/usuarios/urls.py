@@ -19,4 +19,7 @@ urlpatterns = [
     # gerencia de usuarios
     path("gerencia_usuarios/", views_gerencia_usuario.gerencia_usuarios, name="gerencia_usuarios"), # Manage usuarios
     path('register/', views_gerencia_usuario.register_parkcontrol, name='register_parkcontrol'), # Registration page
+    path('editar_usuario/<int:usuario_id>/', views_gerencia_usuario.editar_usuario, name='editar_usuario'),
+    path('excluir_usuario/<int:usuario_id>/', views_gerencia_usuario.excluir_usuario, name='excluir_usuario'),
+
 ]

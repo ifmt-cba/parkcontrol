@@ -36,6 +36,28 @@
                 </div>
             {% endfor %}
         {% endif %}
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <input type="text" name="nome" class="form-control" placeholder="Buscar por nome"
+                    value="{{ search_nome }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="email" class="form-control" placeholder="Buscar por email"
+                    value="{{ search_email }}">
+            </div>
+            <div class="col-md-3">
+                <select name="perfil" class="form-select">
+                    <option value="Todos">Todos os Perfis</option>
+                    <option value="Administrador" {% if filtro_perfil == "Administrador" %}selected{% endif %}>Administrador</option>
+                    <option value="Frentista" {% if filtro_perfil == "Frentista" %}selected{% endif %}>Frentista</option>
+                    <option value="Contador" {% if filtro_perfil == "Contador" %}selected{% endif %}>Contador</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-grid">
+                <button type="submit" class="btn btn-danger">Filtrar</button>
+            </div>
+        </form>
+
         <table class="table table-bordered table-striped">
             <thead class="table">
                 <tr>
@@ -58,9 +80,11 @@
                     <td>{{ usuario.perfil_acesso }}</td>
                     <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-warning">Editar</a>
-                        <a href="#" class="btn btn-sm btn-danger">Excluir</a>
+                        <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'excluir_usuario' usuario.id %}" class="btn btn-sm btn-danger" 
+                        onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
                     </td>
+
                 </tr>
                 {% empty %}
                 <tr>
