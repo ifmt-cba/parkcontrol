@@ -40,17 +40,18 @@
         <form method="post">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="username" class="form-label">Usuário/Matrícula</label>
+                <label for="username" class="form-label">Email</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
-                <label for="first_name" class="form-label">Nome</label>
-                <input type="text" class="form-control" id="first_name" name="first_name" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
+                <label for="email" class="form-label">Confirmação de E-mail</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Nome Completo</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+            
             <div class="mb-3">
                 <label for="perfil_acesso" class="form-label">Perfil de Acesso</label>
                 <select class="form-select" id="perfil_acesso" name="perfil_acesso" required>

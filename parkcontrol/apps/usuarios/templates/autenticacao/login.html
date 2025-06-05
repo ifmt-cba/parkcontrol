@@ -25,7 +25,7 @@
       <!-- login e esqueci a senha -->
       <div class="col-md-6 d-flex flex-column justify-content-center align-items-start p-5">
         <h2 class="fw-bold mb-4">Login</h2>
-        <p class="text-muted">Digite seu usuário e senha</p>
+        <p class="text-muted">Digite seu Email e senha</p>
 
         <!-- Mensagens de erro -->
         {% if messages %}
@@ -39,8 +39,8 @@
 
         <form method="post" class="w-100" action="{% url 'login_parkcontrol' %}">{% csrf_token %}
           <div class="mb-3">
-            <label for="username" class="text-muted">Usuário</label>
-            <input type="text" placeholder="Usuário" class="form-control" id="username" name="username" required>
+            <label for="username" class="text-muted">Email</label>
+            <input type="text" placeholder="Email" class="form-control" id="username" name="username" required>
           </div>
 
           <div class="mb-3">
