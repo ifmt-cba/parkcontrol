@@ -82,20 +82,36 @@ def gerenciamento_pagamentos_home(request):
 
 def gerar_pagamentos_mensalistas_lista_clientes(request):
     """
-    Lista clientes mensalistas ativos para que o contador possa gerar cobranças para eles.
-    Corresponde à tela "Clientes Ativos" do anexo, mas com foco na GERAÇÃO.
+    Lista clientes mensalistas para que o contador possa gerar cobranças para eles.
     """
     query_nome = request.GET.get('nome_cliente', '').strip()
-    query_placa = request.GET.get('placa_veiculo', '').strip()
-    status_filter = request.GET.get('status', 'ativo').strip() # Default para 'ativo'
+    status_filter = request.GET.get('status', 'todos').strip() # <-- Mudado o default para 'todos' para ver tudo inicialmente
+    query_placa = request.GET.get('placa_veiculo', '').strip() # Mantém para o filtro do template
 
-    clientes = ClienteMensalista.objects.select_related('usuario', 'plano').all()
+    # --- CORREÇÃO: Consulta inicial simplificada e ordenada ---
+    # Removido .prefetch_related('veiculos') porque ClienteMensalista não tem essa relação direta.
+    # Adicionado .order_by() para resolver o UnorderedObjectListWarning e garantir ordem.
+    clientes = ClienteMensalista.objects.select_related('usuario', 'plano').order_by('usuario__first_name', 'usuario__last_name').all()
+
+
+    # --- INÍCIO: LINHAS DE DEBUG (Mantenha estas linhas para verificar) ---
+    print(f"\n--- DEBUG View gerar_pagamentos_mensalistas_lista_clientes ---")
+    print(f"URL Params: {request.GET}")
+    print(f"Query Nome (do filtro): '{query_nome}'")
+    print(f"Query Placa (do filtro): '{query_placa}'")
+    print(f"Status Filter (do filtro): '{status_filter}'")
+    print(f"Total ClienteMensalista ANTES dos filtros (na view, após order_by): {clientes.count()}")
+    # --- FIM: LINHAS DE DEBUG ---
 
     if status_filter == 'ativo':
         clientes = clientes.filter(ativo=True)
     elif status_filter == 'inativo':
         clientes = clientes.filter(ativo=False)
     # Se 'todos', não filtra por ativo/inativo
+    
+    # --- INÍCIO: LINHAS DE DEBUG ---
+    print(f"Total ClienteMensalista APÓS filtro de Status: {clientes.count()}")
+    # --- FIM: LINHAS DE DEBUG ---
 
     if query_nome:
         clientes = clientes.filter(
@@ -103,26 +119,39 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
             Q(usuario__last_name__icontains=query_nome) |
             Q(usuario__username__icontains=query_nome)
         )
+    # --- INÍCIO: LINHAS DE DEBUG ---
+    print(f"Total ClienteMensalista APÓS filtro de Nome: {clientes.count()}")
+    # --- FIM: LINHAS DE DEBUG ---
+
     if query_placa:
-        messages.warning(request, "A busca por placa ainda não está implementada para mensalistas. Por favor, ajuste o código.")
-        pass 
+        # --- CORREÇÃO: REMOVIDO o filtro de placa INEXISTENTE no modelo ClienteMensalista ---
+        # Se no futuro ClienteMensalista tiver um campo 'placa', descomente e use:
+        # clientes = clientes.filter(placa__icontains=query_placa)
+        # Se for uma relação com Veiculo (ex: ClienteMensalista -> Veiculo), use:
+        # clientes = clientes.filter(veiculos__placa__icontains=query_placa) # Assumindo 'veiculos' como related_name
+        messages.warning(request, "A busca por placa para mensalistas não está configurada. Ajuste o código ou remova o campo de filtro do template.")
+    
+    # --- INÍCIO: LINHAS DE DEBUG ---
+    print(f"Consulta SQL final: {clientes.query}")
+    print(f"Clientes no QuerySet final (objetos): {list(clientes)}") 
+    print(f"--- Fim DEBUG View gerar_pagamentos_mensalistas_lista_clientes ---\n")
+    # --- FIM: LINHAS DE DEBUG ---
 
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    if not page_obj.object_list and (query_nome or query_placa or status_filter != 'ativo'):
+    if not page_obj.object_list and (query_nome or query_placa or status_filter != 'todos'): # Condição ajustada para 'todos'
         messages.info(request, "Nenhum cliente mensalista encontrado com os filtros informados.")
 
-    context = {
+    return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html', {
+        'titulo_pagina': 'Clientes Mensalistas',
         'page_obj': page_obj,
         'query_nome': query_nome,
-        'query_placa': query_placa,
         'status_filter': status_filter,
-        'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')],
-        'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
-    }
-    return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html', context)
+        'query_placa': query_placa,
+        'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')] # Adicionei 'todos' aqui
+    })
 
 def listagem_pagamentos_geral_redirect(request):
     """
@@ -149,14 +178,14 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id=None):
     if request.method == 'POST':
         form = GerarCobrancaMensalForm(request.POST)
         if form.is_valid():
-            cliente_mensalista_form = form.cleaned_data['cliente_mensalista'] # Renomeado para evitar conflito
+            cliente_mensalista_form = form.cleaned_data['cliente_mensalista']
             mes_referencia_str = form.cleaned_data['mes_referencia']
             data_vencimento = form.cleaned_data['data_vencimento']
             valor_devido = form.cleaned_data['valor_devido']
 
             with transaction.atomic():
                 CobrancaMensalista.objects.create(
-                    cliente_mensalista=cliente_mensalista_form, # Usar o do form
+                    cliente_mensalista=cliente_mensalista_form,
                     mes_referencia=mes_referencia_str,
                     data_vencimento=data_vencimento,
                     valor_devido=valor_devido,

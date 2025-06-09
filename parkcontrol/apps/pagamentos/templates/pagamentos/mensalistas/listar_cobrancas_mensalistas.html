@@ -1,0 +1,130 @@
+{# apps/pagamentos/templates/pagamentos/mensalistas/listar_cobrancas_mensalistas.html #}
+{% load static %}
+{% load form_tags %} {# Para o filtro add_class, se você o tiver em templatetags #}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina }} - ParkControl</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}"> {# Seu CSS global/compartilhado #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
+
+    <header class="bg-danger py-2 px-4 d-flex justify-content-center">
+        <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
+        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+    </header>
+
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="flex-grow-1 d-flex flex-column align-items-center py-5">
+        <h1 class="text-danger fw-bold mb-5">{{ titulo_pagina }}</h1>
+
+        <div class="container bg-light p-4 rounded-4 shadow-sm mb-4">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="id_nome_cliente" class="form-label text-start d-block">Filtrar por Nome do Cliente</label>
+                    <input type="text" name="nome_cliente" id="id_nome_cliente" class="form-control" value="{{ query_nome }}" placeholder="Nome do cliente">
+                </div>
+                <div class="col-md-3">
+                    <label for="id_mes_referencia" class="form-label text-start d-block">Mês de Ref. (MM/AAAA)</label>
+                    <input type="text" name="mes_referencia" id="id_mes_referencia" class="form-control" value="{{ query_mes }}" placeholder="MM/AAAA">
+                </div>
+                <div class="col-md-3">
+                    <label for="id_status" class="form-label text-start d-block">Filtrar por Status</label>
+                    <select name="status" id="id_status" class="form-select">
+                        <option value="">Todos</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-danger w-100" type="submit">Buscar</button>
+                </div>
+            </form>
+        </div>
+
+        {% if cobrancas %} {# Renomeado de page_obj.object_list para 'cobrancas' no contexto #}
+            <div class="container bg-light p-4 rounded-4 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                            <tr class="table-danger text-white">
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Mês Referência</th>
+                                <th>Valor Devido</th>
+                                <th>Valor Pago</th>
+                                <th>Status</th>
+                                <th>Vencimento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cobranca in cobrancas %} {# Iterando diretamente sobre 'cobrancas' #}
+                            <tr>
+                                <td>{{ cobranca.id }}</td>
+                                <td>{{ cobranca.cliente_mensalista.usuario.get_full_name|default:cobranca.cliente_mensalista.usuario.username }}</td>
+                                <td>{{ cobranca.mes_referencia }}</td>
+                                <td>R$ {{ cobranca.valor_devido|floatformat:2 }}</td>
+                                <td>R$ {{ cobranca.valor_pago|floatformat:2 }}</td>
+                                <td>{{ cobranca.get_status_display }}</td>
+                                <td>{{ cobranca.data_vencimento|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{% url 'pagamentos:detalhe_cobranca_mensalista' cobranca.id %}" class="btn btn-sm btn-info text-white me-1" title="Detalhes">
+                                        <i class="bi bi-eye"></i> Detalhes
+                                    </a>
+                                    <a href="{% url 'pagamentos:editar_cobranca_mensalista_status' cobranca.id %}" class="btn btn-sm btn-warning me-1" title="Editar Status">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a href="{% url 'pagamentos:excluir_cobranca_mensalista' cobranca.id %}" class="btn btn-sm btn-danger" title="Excluir">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Paginação (se a view estiver paginando com Paginator) #}
+                {# Se a view listar_cobrancas_mensalistas usar Paginator, ajuste esta parte #}
+                {# Por padrão, a view listar_cobrancas_mensalistas NÃO USA Paginator, então o trecho abaixo é para a view que o usar #}
+                {# <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&nome_cliente={{ query_nome }}&mes_referencia={{ query_mes }}&status={{ status_filter }}">Anterior</a></li>
+                        {% endif %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&nome_cliente={{ query_nome }}&mes_referencia={{ query_mes }}&status={{ status_filter }}">Próxima</a></li>
+                        {% endif %}
+                    </ul>
+                </nav> #}
+            </div>
+        {% else %}
+            <p class="mt-4">Nenhuma cobrança de mensalista encontrada com os filtros aplicados.</p>
+        {% endif %}
+    </main>
+
+    <footer class="pb-4">
+        <a href="{% url 'pagamentos:gerenciamento_pagamentos_home' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

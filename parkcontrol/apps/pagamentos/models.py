@@ -82,6 +82,7 @@ class PlanoMensal(models.Model):
 class ClienteMensalista(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
     plano = models.ForeignKey(PlanoMensal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Plano Mensal")
+    placa_veiculo = models.CharField(max_length=10, blank=True, null=True, verbose_name="Placa do Veículo")
     data_cadastro = models.DateTimeField(auto_now_add=True, verbose_name="Data de Cadastro")
     ativo = models.BooleanField(default=True, verbose_name="Ativo no Plano")
     email_para_cobranca = models.EmailField(blank=True, null=True, verbose_name="E-mail para Cobrança")
@@ -191,9 +192,6 @@ class CobrancaMensalista(models.Model):
         return self.valor_devido - self.valor_pago
     
     def salvar_pagamento(self, valor_recebido):
-        """
-        Método para registrar um pagamento para esta cobrança de mensalista.
-        """
         if self.esta_paga():
             return "Cobranca já paga."
 

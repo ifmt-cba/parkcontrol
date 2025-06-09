@@ -1,4 +1,4 @@
-{# templates/pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html #}
+{# apps/pagamentos/templates/pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html #}
 {% load static %}
 {% load form_tags %} {# Para o filtro add_class, se você o tiver em templatetags #}
 
@@ -16,6 +16,7 @@
 
     <header class="bg-danger py-2 px-4 d-flex justify-content-center">
         <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
+        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
     <div class="container mt-3">
@@ -40,7 +41,6 @@
                     <label for="{{ form.cliente_mensalista.id_for_label }}" class="form-label text-start d-block">
                         {{ form.cliente_mensalista.label }} <span class="text-danger">*</span>
                     </label>
-                    {# Adiciona a classe Bootstrap 'form-select' #}
                     {{ form.cliente_mensalista|add_class:"form-select" }} 
                     {% for error in form.cliente_mensalista.errors %}
                         <div class="text-danger small text-start">{{ error }}</div>
@@ -51,7 +51,6 @@
                     <label for="{{ form.mes_referencia.id_for_label }}" class="form-label text-start d-block">
                         {{ form.mes_referencia.label }} <span class="text-danger">*</span>
                     </label>
-                    {# Adiciona a classe Bootstrap 'form-control' #}
                     {{ form.mes_referencia|add_class:"form-control" }} 
                     {% for error in form.mes_referencia.errors %}
                         <div class="text-danger small text-start">{{ error }}</div>
@@ -62,7 +61,6 @@
                     <label for="{{ form.data_vencimento.id_for_label }}" class="form-label text-start d-block">
                         {{ form.data_vencimento.label }} <span class="text-danger">*</span>
                     </label>
-                    {# Adiciona a classe Bootstrap 'form-control' #}
                     {{ form.data_vencimento|add_class:"form-control" }} 
                     {% for error in form.data_vencimento.errors %}
                         <div class="text-danger small text-start">{{ error }}</div>
@@ -75,7 +73,6 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-text">R$</span>
-                        {# Adiciona a classe Bootstrap 'form-control' #}
                         {{ form.valor_devido|add_class:"form-control" }} 
                     </div>
                     {% for error in form.valor_devido.errors %}

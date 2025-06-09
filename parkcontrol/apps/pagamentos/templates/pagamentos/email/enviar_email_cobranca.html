@@ -1,0 +1,23 @@
+{# apps/pagamentos/templates/pagamentos/email/email_cobranca_template.html #}
+<p>Prezado(a) {{ cobranca.cliente_mensalista.usuario.get_full_name|default:"cliente" }},</p>
+<p>Gostaríamos de lembrar sobre sua mensalidade do ParkControl.</p>
+
+<p><strong>Detalhes da Cobrança:</strong></p>
+<ul>
+    <li><strong>ID da Cobrança:</strong> #{{ cobranca.id }}</li>
+    <li><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</li>
+    <li><strong>Valor Devido:</strong> R$ {{ cobranca.valor_devido|floatformat:2 }}</li>
+    <li><strong>Valor Pago (até o momento):</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</li>
+    <li><strong>Saldo Pendente:</strong> R$ {{ cobranca.calcular_saldo_pendente|floatformat:2 }}</li>
+    <li><strong>Data de Vencimento:</strong> {{ cobranca.data_vencimento|date:"d/m/Y" }}</li>
+    <li><strong>Status:</strong> {{ cobranca.get_status_display }}</li>
+</ul>
+
+<p>Por favor, realize o pagamento para evitar juros e manter seu plano ativo.</p>
+<p>Para mais detalhes ou para realizar o pagamento, acesse sua conta no ParkControl.</p>
+
+<p>Atenciosamente,</p>
+<p>Equipe ParkControl</p>
+
+<hr>
+<p style="font-size: 0.8em; color: #666;">Este é um e-mail automático, por favor, não responda a este e-mail.</p>
