@@ -71,7 +71,7 @@
                         <tbody>
                             {% for cliente in page_obj %}
                             <tr>
-                                <td>{{ cliente.usuario.get_full_name|default:cliente.usuario.username }}</td>
+                                <td>{{ cliente.nome }}</td>
                                 <td>{{ cliente.plano.nome_plano|default:"N/A" }}</td>
                                 <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
                                 <td>

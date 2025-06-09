@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from apps.usuarios.models import Usuario
+from apps.clientes.models import Mensalista
 from decimal import Decimal
 import math
 
@@ -79,24 +80,24 @@ class PlanoMensal(models.Model):
     def __str__(self):
         return f"{self.nome_plano} (R${self.valor_mensal:.2f})"
     
-class ClienteMensalista(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
-    plano = models.ForeignKey(PlanoMensal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Plano Mensal")
-    placa_veiculo = models.CharField(max_length=10, blank=True, null=True, verbose_name="Placa do Veículo")
-    data_cadastro = models.DateTimeField(auto_now_add=True, verbose_name="Data de Cadastro")
-    ativo = models.BooleanField(default=True, verbose_name="Ativo no Plano")
-    email_para_cobranca = models.EmailField(blank=True, null=True, verbose_name="E-mail para Cobrança")
-
-    class Meta:
-        verbose_name = "Cliente Mensalista"
-        verbose_name_plural = "Clientes Mensalistas" 
-
-    def __str__(self):
-        return f"{self.usuario.get_full_name() or self.usuario.username} ({'Ativo' if self.ativo else 'Inativo'})"
-
-    def get_email_para_cobranca(self):
-        return self.email_para_cobranca or self.usuario.email
-
+#class ClienteMensalista(models.Model):
+#    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
+#    plano = models.ForeignKey(PlanoMensal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Plano Mensal")
+#    placa_veiculo = models.CharField(max_length=10, blank=True, null=True, verbose_name="Placa do Veículo")
+#    data_cadastro = models.DateTimeField(auto_now_add=True, verbose_name="Data de Cadastro")
+#    ativo = models.BooleanField(default=True, verbose_name="Ativo no Plano")
+#    email_para_cobranca = models.EmailField(blank=True, null=True, verbose_name="E-mail para Cobrança")
+#
+#    class Meta:
+#        verbose_name = "Cliente Mensalista"
+#        verbose_name_plural = "Clientes Mensalistas" 
+#
+#    def __str__(self):
+#        return f"{self.usuario.get_full_name() or self.usuario.username} ({'Ativo' if self.ativo else 'Inativo'})"
+#
+#    def get_email_para_cobranca(self):
+#        return self.email_para_cobranca or self.usuario.email
+#
 class CobrancaDiarista(models.Model):
     STATUS_CHOICES = [
         ('pendente', 'Pendente'),
@@ -160,7 +161,7 @@ class CobrancaMensalista(models.Model):
         ('cancelado', 'Cancelado'),
     ]
 
-    cliente_mensalista = models.ForeignKey(ClienteMensalista, on_delete=models.CASCADE, verbose_name="Cliente Mensalista")
+    cliente_mensalista = models.ForeignKey(Mensalista, on_delete=models.CASCADE, verbose_name="Cliente Mensalista")
     
     data_geracao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Geração")
     data_vencimento = models.DateField(verbose_name="Data de Vencimento")
