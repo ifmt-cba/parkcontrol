@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{%block title%}Solicitar Manunteção{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-danger fw-bold mb-4 text-center">Solicitar Manutenção</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Nº da Vaga</label>
+            {{ form.numero_vaga }}
+        </div>
+        <div class="form-group mt-3">
+            <label>Descrição do Problema</label>
+            {{ form.descricao }}
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'frentistas:gerenciar_vagas' %}" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Voltar</a>
+            <button type="submit" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Enviar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
