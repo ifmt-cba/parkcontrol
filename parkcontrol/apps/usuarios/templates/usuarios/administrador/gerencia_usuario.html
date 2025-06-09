@@ -43,11 +43,11 @@
         <form method="get" class="row g-3 mb-4">
             <div class="col-md-3">
                 <input type="text" name="nome" class="form-control" placeholder="Buscar por nome"
-                    value="{{ search_nome }}">
+                    value="{{ search_nome |default:'' }}">
             </div>
             <div class="col-md-3">
                 <input type="text" name="email" class="form-control" placeholder="Buscar por email"
-                    value="{{ search_email }}">
+                    value="{{ search_email |default:'' }}">
             </div>
             <div class="col-md-3">
                 <select name="perfil" class="form-select">

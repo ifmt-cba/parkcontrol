@@ -37,7 +37,7 @@ def gerencia_usuarios(request):
 @user_passes_test(is_administrador, login_url='login_parkcontrol')
 def register_parkcontrol(request):
     if request.method == 'POST':
-        username = request.POST.get('username')  # matrícula ou ID interno
+        username = request.POST.get('username')  # email
         email = request.POST.get('email')
         password = request.POST.get('password')
         first_name = request.POST.get('first_name')
