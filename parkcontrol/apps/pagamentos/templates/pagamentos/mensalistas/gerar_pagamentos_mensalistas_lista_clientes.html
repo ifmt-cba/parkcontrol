@@ -72,7 +72,7 @@
                             {% for cliente in page_obj %}
                             <tr>
                                 <td>{{ cliente.nome }}</td>
-                                <td>{{ cliente.plano.nome_plano|default:"N/A" }}</td>
+                                <td>{{ cliente.plano|default:"N/A" }}</td>
                                 <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
                                 <td>
                                     <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual_com_cliente' cliente.id %}" class="btn btn-sm btn-outline-danger">Gerar</a>

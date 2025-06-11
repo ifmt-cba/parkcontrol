@@ -1,5 +1,5 @@
 {# apps/pagamentos/templates/pagamentos/email/email_cobranca_template.html #}
-<p>Prezado(a) {{ cobranca.cliente_mensalista.usuario.get_full_name|default:"cliente" }},</p>
+<p>Prezado(a) {{ cobranca.cliente_mensalista.nome|default:"cliente" }},</p>
 <p>Gostaríamos de lembrar sobre sua mensalidade do ParkControl.</p>
 
 <p><strong>Detalhes da Cobrança:</strong></p>

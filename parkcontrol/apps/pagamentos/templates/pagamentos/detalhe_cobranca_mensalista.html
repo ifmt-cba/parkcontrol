@@ -34,7 +34,7 @@
         <h1 class="text-danger fw-bold mb-5">Detalhes da Cobrança #{{ cobranca.id }}</h1>
 
         <div class="container bg-light p-4 rounded-4 shadow-sm text-start">
-            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.usuario.get_full_name|default:cobranca.cliente_mensalista.usuario.username }}</p>
+            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.nome }}</p>
             <p><strong>Plano:</strong> {{ cobranca.cliente_mensalista.plano.nome_plano|default:"N/A" }}</p>
             <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
             <p><strong>Data de Geração:</strong> {{ cobranca.data_geracao|date:"d/m/Y H:i" }}</p>

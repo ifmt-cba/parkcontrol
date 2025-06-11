@@ -1,16 +1,19 @@
 # apps/pagamentos/forms.py
 from django import forms
+
 from apps.clientes.models import Mensalista
+from apps.planos.models import Planos
+
 from .models import CobrancaDiarista, CobrancaMensalista 
+
 from django.core.exceptions import ValidationError
 import re
 from decimal import Decimal
 from django.contrib import messages
 
 class GerarCobrancaMensalForm(forms.Form):
-    # O queryset agora aponta para o modelo Mensalista do app clientes.
     cliente_mensalista = forms.ModelChoiceField(
-        queryset=Mensalista.objects.filter(ativo=True), # <-- CORRIGIDO: Usa Mensalista
+        queryset=Mensalista.objects.filter(ativo=True),
         label="Cliente Mensalista",
         empty_label="Selecione um cliente mensalista",
         error_messages={'required': 'Selecione um cliente mensalista para gerar a cobrança.'}
@@ -18,7 +21,7 @@ class GerarCobrancaMensalForm(forms.Form):
 
     mes_referencia = forms.CharField(
         max_length=7,
-        label="Mês de Referência (MM/AAAA)", # Ex: 05/2025 (ajustei a máscara para MM/AAAA)
+        label="Mês de Referência (MM/AAAA)",
         help_text="Ex: 05/2025",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'MM/AAAA'})
     )
@@ -40,7 +43,6 @@ class GerarCobrancaMensalForm(forms.Form):
 
     def clean_mes_referencia(self):
         mes_referencia = self.cleaned_data['mes_referencia']
-        # Validação de formato MM/AAAA (como no Dicionário de Dados)
         if not re.match(r'^(0[1-9]|1[0-2])/\d{4}$', mes_referencia):
             raise ValidationError("Formato de mês/ano inválido. Use MM/AAAA.")
         return mes_referencia
@@ -51,7 +53,6 @@ class GerarCobrancaMensalForm(forms.Form):
         mes_referencia_str = cleaned_data.get('mes_referencia')
         valor_digitado = cleaned_data.get('valor_devido')
 
-        # Importe Planos aqui dentro, se não for usado globalmente no forms.py
         from apps.planos.models import Planos as PlanosApp 
 
         if cliente_mensalista_obj and cliente_mensalista_obj.plano:
@@ -82,6 +83,10 @@ class GerarCobrancaMensalForm(forms.Form):
                 )
         
         return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
 
 class CobrancaDiaristaStatusForm(forms.ModelForm):
     class Meta:

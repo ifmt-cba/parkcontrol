@@ -1,25 +1,29 @@
+# apps/pagamentos/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.core.paginator import Paginator
 from decimal import Decimal
 from datetime import datetime, date
 import calendar
 import re 
-from django.core.paginator import Paginator
 
+# --- Importações de modelos dos apps ---
 from apps.usuarios.models import Usuario 
 from apps.clientes.models import Mensalista
 from apps.planos.models import Planos
 
-# Importações de e-mail
+# --- Importações de e-mail ---
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.html import strip_tags
 
-from .models import Movimento, ConfiguracaoTarifa, PlanoMensal, CobrancaDiarista, CobrancaMensalista
+# --- Modelos app pagamentos ---
+from .models import Movimento, ConfiguracaoTarifa, CobrancaDiarista, CobrancaMensalista
 from .forms import GerarCobrancaMensalForm, CobrancaDiaristaStatusForm, CobrancaMensalistaStatusForm
 
 
@@ -81,6 +85,7 @@ def registrar_pagamento_diarista(request, cobranca_id):
     
     return render(request, 'pagamentos/registrar_pagamento_diarista.html', {'cobranca': cobranca})
 
+
 # --- Views para Contador (Gerenciamento de Pagamentos) ---
 
 
@@ -90,16 +95,21 @@ def gerenciamento_pagamentos_home(request):
     """
     return render(request, 'pagamentos/gerenciamento_pagamentos_home.html')
 
+def listagem_pagamentos_geral_redirect(request):
+    """
+    View auxiliar para o botão "Visualizar e Editar Pagamentos"
+    """
+    return redirect('pagamentos:listar_cobrancas_mensalistas') 
+
 def gerar_pagamentos_mensalistas_lista_clientes(request):
     """
-    Lista clientes Mensalista (do app clientes) para que o contador possa gerar cobranças para eles.
+    Lista clientes Mensalista para que o contador possa gerar cobranças para eles.
     """
     query_nome = request.GET.get('nome_cliente', '').strip()
-    status_filter = request.GET.get('status', 'ativo').strip() # Default para 'ativo'
+    status_filter = request.GET.get('status', 'ativo').strip()
     query_placa = request.GET.get('placa_veiculo', '').strip()
 
-    # --- CONSULTA AGORA USA Mensalista do app clientes ---
-    clientes = Mensalista.objects.all().order_by('nome') # Ordena por nome do Mensalista
+    clientes = Mensalista.objects.all().order_by('nome')
 
     print(f"\n--- DEBUG View gerar_pagamentos_mensalistas_lista_clientes ---")
     print(f"URL Params: {request.GET}")
@@ -112,22 +122,12 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         clientes = clientes.filter(ativo=True)
     elif status_filter == 'inativo':
         clientes = clientes.filter(ativo=False)
-    
-    print(f"Total Mensalista APÓS filtro de Status: {clientes.count()}")
 
     if query_nome:
-        clientes = clientes.filter(nome__icontains=query_nome) # Filtra pelo campo 'nome' do Mensalista
-    
-    print(f"Total Mensalista APÓS filtro de Nome: {clientes.count()}")
+        clientes = clientes.filter(nome__icontains=query_nome)
 
     if query_placa:
-        # Mensalista (do app clientes) tem um campo 'placa', então o filtro é direto.
         clientes = clientes.filter(placa__icontains=query_placa)
-        print(f"Total Mensalista APÓS filtro de Placa: {clientes.count()}")
-    
-    print(f"Consulta SQL final: {clientes.query}")
-    print(f"Clientes no QuerySet final (objetos): {list(clientes)}") 
-    print(f"--- Fim DEBUG View gerar_pagamentos_mensalistas_lista_clientes ---\n")
 
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get('page')
@@ -137,7 +137,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         messages.info(request, "Nenhum cliente mensalista encontrado com os filtros informados.")
 
     return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html', {
-        'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
+        'titulo_pagina': 'Clientes Mensalistas',
         'page_obj': page_obj,
         'query_nome': query_nome,
         'status_filter': status_filter,
@@ -145,16 +145,9 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
     })
 
-def listagem_pagamentos_geral_redirect(request):
-    """
-    View auxiliar para o botão "Visualizar e Editar Pagamentos"
-    """
-    return redirect('pagamentos:listar_cobrancas_mensalistas') 
-
 def gerar_pagamentos_mensalistas_manual(request, cliente_id=None): 
     """
-    Gerar Pagamentos Mensalistas (manual pelo contador).
-    Pode receber um cliente_id (do modelo Mensalista) para pré-preencher o formulário.
+    Gerar Pagamentos Mensalistas.
     """
     initial_data = {}
     cliente_mensalista_obj = None
@@ -165,19 +158,24 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id=None):
         
         if hasattr(cliente_mensalista_obj, 'plano') and cliente_mensalista_obj.plano:
             try:
-                plano_do_cliente = Planos.objects.get(nome=cliente_mensalista_obj.plano, tipo_plano='Mensalista')
-                initial_data['valor_devido'] = plano_do_cliente.valor
+                plano_do_cliente = Planos.objects.get(
+                    nome=cliente_mensalista_obj.plano, 
+                    tipo_plano='Mensalista', 
+                    status='Ativo' 
+                )
+                initial_data['valor_devido'] = plano_do_cliente.valor 
             except Planos.DoesNotExist:
                 messages.warning(request, f"Plano '{cliente_mensalista_obj.plano}' não encontrado ou não é um plano Mensalista. Preencha o valor manualmente.")
-                initial_data['valor_devido'] = Decimal('0.00')
+                initial_data['valor_devido'] = Decimal('0.00') 
+        else:
+            messages.warning(request, "Cliente não possui plano definido ou válido. Preencha o valor manualmente.")
 
         today = timezone.now().date()
         initial_data['mes_referencia'] = today.strftime('%m/%Y')
 
     if request.method == 'POST':
-        form = GerarCobrancaMensalForm(request.POST)
+        form = GerarCobrancaMensalForm(request.POST, request=request) 
         if form.is_valid():
-
             cliente_mensalista_id = form.cleaned_data['cliente_mensalista'] 
             cliente_mensalista_obj_from_form = get_object_or_404(Mensalista, id=cliente_mensalista_id)
 
@@ -187,7 +185,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id=None):
 
             with transaction.atomic():
                 CobrancaMensalista.objects.create(
-                    cliente_mensalista=cliente_mensalista_obj_from_form,
+                    cliente_mensalista=cliente_mensalista_obj_from_form, 
                     mes_referencia=mes_referencia_str,
                     data_vencimento=data_vencimento,
                     valor_devido=valor_devido,
@@ -202,58 +200,256 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id=None):
                     messages.error(request, f"Erro no campo '{field_name}': {error}")
             return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', {'form': form})
     else:
-        form = GerarCobrancaMensalForm(initial=initial_data)
+        form = GerarCobrancaMensalForm(initial=initial_data, request=request)
 
     context = {'form': form}
     return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
 
-def detalhe_cobranca_diarista(request, cobranca_id):
-    cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
-    return render(request, 'pagamentos/detalhe_cobranca_diarista.html', {'cobranca': cobranca})
+def listar_cobrancas_diaristas(request):
+    """
+    Lista todas as cobranças de diaristas, com filtros e paginação.
+    """
+    query_placa = request.GET.get('placa_veiculo', '').strip()
+    status_filter = request.GET.get('status', '').strip()
 
-def editar_status_cobranca_diarista(request, cobranca_id):
-    cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
-    if request.method == 'POST':
-        form = CobrancaDiaristaStatusForm(request.POST)
-        if form.is_valid():
-            cobranca.status = form.cleaned_data['status']
-            if cobranca.status == 'pago' and not cobranca.data_pagamento:
-                cobranca.data_pagamento = timezone.now()
-                cobranca.valor_pago = cobranca.valor_devido
-            cobranca.save()
-            messages.success(request, "Status da cobrança de diarista atualizado com sucesso.")
-            return redirect('pagamentos:detalhe_cobranca_diarista', cobranca_id=cobranca.id)
-    else:
-        form = CobrancaDiaristaStatusForm(initial={'status': cobranca.status})
-    return render(request, 'pagamentos/editar_status_cobranca_diarista.html', {'form': form, 'cobranca': cobranca})
+    cobrancas = CobrancaDiarista.objects.select_related('movimento').all()
 
+    if query_placa:
+        cobrancas = cobrancas.filter(movimento__placa_veiculo__icontains=query_placa)
+    if status_filter:
+        cobrancas = cobrancas.filter(status=status_filter)
+    
+    cobrancas = cobrancas.order_by('-data_geracao')
 
-def detalhe_cobranca_mensalista(request, cobranca_id):
-    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
-    return render(request, 'pagamentos/detalhe_cobranca_mensalista.html', {'cobranca': cobranca})
+    paginator = Paginator(cobrancas, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-def editar_status_cobranca_mensalista(request, cobranca_id):
-    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
-    if request.method == 'POST':
-        form = CobrancaMensalistaStatusForm(request.POST)
-        if form.is_valid():
-            cobranca.status = form.cleaned_data['status']
-            # Se o status for 'pago', defina data_pagamento
-            if cobranca.status == 'pago' and not cobranca.data_pagamento:
-                cobranca.data_pagamento = timezone.now()
-                cobranca.valor_pago = cobranca.valor_devido # Assumindo pagamento integral
-            cobranca.save()
-            messages.success(request, "Status da cobrança de mensalista atualizado com sucesso.")
-            return redirect('pagamentos:detalhe_cobranca_mensalista', cobranca_id=cobranca.id)
-    else:
-        form = CobrancaMensalistaStatusForm(initial={'status': cobranca.status})
-    return render(request, 'pagamentos/editar_status_cobranca_mensalista.html', {'form': form, 'cobranca': cobranca})
-
-def listar_cobrancas_mensalistas(request):
-    cobrancas = CobrancaMensalista.objects.all().order_by('-data_geracao')
+    if not page_obj.object_list and (query_placa or status_filter != 'todos'):
+        messages.info(request, "Nenhuma cobrança de diarista encontrada com os filtros informados.")
 
     context = {
-        'cobrancas': cobrancas,
-        'titulo_pagina': 'Listagem de Cobranças Mensalistas'
+        'page_obj': page_obj,
+        'query_placa': query_placa,
+        'status_filter': status_filter,
+        'status_choices': CobrancaDiarista.STATUS_CHOICES + [('todos', 'Todos')],
+    }
+    return render(request, 'pagamentos/diaristas/listar_cobrancas_diaristas.html', context)
+
+def detalhe_cobranca_diarista(request, cobranca_id):
+    """
+    Exibe os detalhes de uma cobrança de diarista específica.
+    """
+    cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
+    return render(request, 'pagamentos/diaristas/detalhe_cobranca_diarista.html', {'cobranca': cobranca})
+
+def editar_cobranca_diarista_status(request, cobranca_id):
+    """
+    Permite ao contador editar o status e valor pago de uma cobrança de diarista.
+    """
+    cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
+    
+    if request.method == 'POST':
+        form = CobrancaDiaristaStatusForm(request.POST, instance=cobranca) 
+        if form.is_valid():
+            with transaction.atomic():
+                form.save()
+                messages.success(request, f"Status da cobrança de diarista {cobranca.id} atualizado para '{cobranca.get_status_display()}'.")
+                if cobranca.status == 'pago' and not cobranca.data_pagamento:
+                    cobranca.data_pagamento = timezone.now()
+                    cobranca.save()
+                return redirect('pagamentos:detalhe_cobranca_diarista', cobranca_id=cobranca.id)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    field_name = form[field].label or field
+                    messages.error(request, f"Erro no campo '{field_name}': {error}")
+    else:
+        form = CobrancaDiaristaStatusForm(instance=cobranca)
+    
+    return render(request, 'pagamentos/diaristas/editar_cobranca_diarista_status.html', {'form': form, 'cobranca': cobranca})
+
+def excluir_cobranca_diarista(request, cobranca_id):
+    """
+    Confirma e executa a exclusão de uma cobrança de diarista.
+    """
+    cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
+    if request.method == 'POST':
+        cobranca.delete()
+        messages.success(request, f"Cobrança de diarista {cobranca_id} excluída com sucesso.")
+        return redirect('pagamentos:listar_cobrancas_diaristas')
+    return render(request, 'pagamentos/diaristas/excluir_cobranca_diarista_confirm.html', {'cobranca': cobranca})
+
+# --- Cobranças de Mensalistas (CRUD para o Contador) ---
+
+def listar_cobrancas_mensalistas(request):
+    """
+    Lista todas as cobranças de mensalistas, com filtros e paginação.
+    Esta view serve como a "Listagem de Pagamentos (Geral)" do caso de uso, focando em mensalistas.
+    """
+    query_nome = request.GET.get('nome_cliente', '').strip()
+    query_mes = request.GET.get('mes_referencia', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
+    cobrancas = CobrancaMensalista.objects.select_related('cliente_mensalista__nome', 'cliente_mensalista__plano').all()
+
+    if query_nome:
+        cobrancas = cobrancas.filter(cliente_mensalista__nome__icontains=query_nome)
+    if query_mes:
+        if re.match(r'^(0[1-9]|1[0-2])/\d{4}$', query_mes):
+            cobrancas = cobrancas.filter(mes_referencia=query_mes)
+        else:
+            messages.error(request, "Formato de Mês/Ano inválido para filtro. Use MM/AAAA.")
+    if status_filter:
+        cobrancas = cobrancas.filter(status=status_filter)
+    
+    cobrancas = cobrancas.order_by('-data_vencimento', '-data_geracao')
+
+    paginator = Paginator(cobrancas, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if not page_obj.object_list and (query_nome or query_mes or status_filter != 'todos'):
+        messages.info(request, "Nenhuma cobrança de mensalista encontrada com os filtros informados.")
+
+    context = {
+        'page_obj': page_obj,
+        'query_nome': query_nome,
+        'query_mes': query_mes,
+        'status_filter': status_filter,
+        'status_choices': CobrancaMensalista.STATUS_CHOICES + [('todos', 'Todos')],
     }
     return render(request, 'pagamentos/mensalistas/listar_cobrancas_mensalistas.html', context)
+
+def detalhe_cobranca_mensalista(request, cobranca_id):
+    """
+    Exibe os detalhes de uma cobrança de mensalista específica.
+    """
+    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+    return render(request, 'pagamentos/mensalistas/detalhe_cobranca_mensalista.html', {'cobranca': cobranca})
+
+def editar_cobranca_mensalista_status(request, cobranca_id):
+    """
+    Permite ao contador editar o status e valor pago de uma cobrança de mensalista.
+    """
+    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+    
+    if request.method == 'POST':
+        form = CobrancaMensalistaStatusForm(request.POST, instance=cobranca) 
+        if form.is_valid():
+            with transaction.atomic():
+                form.save()
+                messages.success(request, f"Status da cobrança de mensalista {cobranca.id} atualizado para '{cobranca.get_status_display()}'.")
+                if cobranca.status == 'pago' and not cobranca.data_pagamento:
+                    cobranca.data_pagamento = timezone.now()
+                    cobranca.save()
+                return redirect('pagamentos:detalhe_cobranca_mensalista', cobranca_id=cobranca.id)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    field_name = form[field].label or field
+                    messages.error(request, f"Erro no campo '{field_name}': {error}")
+    else:
+        form = CobrancaMensalistaStatusForm(instance=cobranca)
+    
+    return render(request, 'pagamentos/mensalistas/editar_cobranca_mensalista_status.html', {'form': form, 'cobranca': cobranca})
+
+def excluir_cobranca_mensalista(request, cobranca_id):
+    """
+    Confirma e executa a exclusão de uma cobrança de mensalista.
+    """
+    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+    if request.method == 'POST':
+        cobranca.delete()
+        messages.success(request, f"Cobrança de mensalista {cobranca_id} excluída com sucesso.")
+        return redirect('pagamentos:listar_cobrancas_mensalistas')
+    return render(request, 'pagamentos/mensalistas/excluir_cobranca_mensalista_confirm.html', {'cobranca': cobranca})
+
+def listar_cobrancas_para_email(request):
+    """
+    Lista as cobranças de mensalistas que estão "Em aberto" (pendentes ou parcialmente pagas)
+    para o contador poder enviar e-mail de cobrança.
+    RN01 - Somente pagamentos com status "Pendente" ou "Parcialmente Pago" (em aberto) devem ser exibidos.
+    """
+    query_nome = request.GET.get('nome_cliente', '').strip()
+    
+    cobrancas_em_aberto = CobrancaMensalista.objects.filter(
+        Q(status='pendente') | Q(status='parcialmente_pago')
+    ).select_related('cliente_mensalista').all()
+
+    if query_nome:
+        cobrancas_em_aberto = cobrancas_em_aberto.filter(
+            cliente_mensalista__nome__icontains=query_nome
+        )
+    
+    paginator = Paginator(cobrancas_em_aberto, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if not page_obj.object_list and query_nome:
+        messages.info(request, "Nenhum resultado para os filtros informados.")
+
+    context = {
+        'page_obj': page_obj, 
+        'query_nome': query_nome,
+    }
+    return render(request, 'pagamentos/mensalistas/enviar_email_cobranca.html', context)
+
+def disparar_email_cobranca(request, cobranca_id):
+    """
+    Lógica para realmente enviar o e-mail de cobrança para uma cobrança específica de mensalista.
+    """
+    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+
+    if not (cobranca.status == 'pendente' or cobranca.status == 'parcialmente_pago'):
+        messages.error(request, "Não é possível enviar e-mail para cobranças já pagas ou canceladas.")
+        return redirect('pagamentos:listar_cobrancas_para_email')
+
+    if not cobranca.cliente_mensalista or not cobranca.cliente_mensalista.email: 
+        messages.error(request, "Cliente mensalista não associado ou e-mail de cobrança não disponível para esta cobrança.")
+        return redirect('pagamentos:listar_cobrancas_para_email')
+
+    try:
+        html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': cobranca})
+        plain_message = strip_tags(html_message)
+
+        send_mail(
+            subject=f"ParkControl: Lembrete de Cobrança #{cobranca.id} - Ref. {cobranca.mes_referencia}",
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cobranca.cliente_mensalista.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        messages.success(request, f"E-mail de cobrança enviado com sucesso para {cobranca.cliente_mensalista.email}.")
+    except Exception as e:
+        messages.error(request, f"Erro ao enviar e-mail: {e}. Verifique as configurações de e-mail.")
+    
+    return redirect('pagamentos:listar_cobrancas_para_email')
+
+def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
+    """
+    View para emitir recibo de uma cobrança, seja diarista ou mensalista.
+    tipo_cobranca_str deve ser 'diarista' ou 'mensalista'.
+    """
+    if tipo_cobranca_str == 'diarista':
+        cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
+    elif tipo_cobranca_str == 'mensalista':
+        cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+    else:
+        messages.error(request, "Tipo de cobrança inválido para emitir recibo.")
+        return redirect('home_parkcontrol')
+
+    if not cobranca.esta_paga() and cobranca.status != 'parcialmente_pago':
+        messages.warning(request, "Não é possível emitir recibo para uma cobrança não paga ou parcialmente paga (sem valor pago).")
+        if tipo_cobranca_str == 'diarista':
+            return redirect('pagamentos:detalhe_cobranca_diarista', cobranca_id=cobranca.id)
+        else:
+            return redirect('pagamentos:detalhe_cobranca_mensalista', cobranca_id=cobranca.id)
+
+    context = {
+        'cobranca': cobranca, 'data_emissao': timezone.now(), 'tipo_cobranca': tipo_cobranca_str,
+        'nome_estacionamento': 'ParkControl Estacionamento', 'endereco_estacionamento': 'Rua Exemplo, 123 - Cidade - UF',
+        'cnpj_estacionamento': 'XX.XXX.XXX/YYYY-ZZ',
+    }
+    return render(request, 'pagamentos/recibo.html', context)
