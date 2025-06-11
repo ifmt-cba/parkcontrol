@@ -102,108 +102,141 @@ def listagem_pagamentos_geral_redirect(request):
     return redirect('pagamentos:listar_cobrancas_mensalistas') 
 
 def gerar_pagamentos_mensalistas_lista_clientes(request):
-    """
-    Lista clientes Mensalista para que o contador possa gerar cobranças para eles.
-    """
     query_nome = request.GET.get('nome_cliente', '').strip()
     status_filter = request.GET.get('status', 'ativo').strip()
     query_placa = request.GET.get('placa_veiculo', '').strip()
+    clientes_base_query = Mensalista.objects.all().order_by('nome') 
 
-    clientes = Mensalista.objects.all().order_by('nome')
-
-    print(f"\n--- DEBUG View gerar_pagamentos_mensalistas_lista_clientes ---")
-    print(f"URL Params: {request.GET}")
-    print(f"Query Nome (do filtro): '{query_nome}'")
-    print(f"Query Placa (do filtro): '{query_placa}'")
-    print(f"Status Filter (do filtro): '{status_filter}'")
-    print(f"Total Mensalista ANTES dos filtros (na view, após order_by): {clientes.count()}")
-
+    clientes_filtrados = clientes_base_query
     if status_filter == 'ativo':
-        clientes = clientes.filter(ativo=True)
+        clientes_filtrados = clientes_filtrados.filter(ativo=True)
     elif status_filter == 'inativo':
-        clientes = clientes.filter(ativo=False)
+        clientes_filtrados = clientes_filtrados.filter(ativo=False)
 
     if query_nome:
-        clientes = clientes.filter(nome__icontains=query_nome)
+        clientes_filtrados = clientes_filtrados.filter(nome__icontains=query_nome) 
 
     if query_placa:
-        clientes = clientes.filter(placa__icontains=query_placa)
+        clientes_filtrados = clientes_filtrados.filter(placa__icontains=query_placa)
 
-    paginator = Paginator(clientes, 10)
+    clientes_com_cobrancas = []
+    for cliente in clientes_filtrados: 
+        ultima_cobranca = CobrancaMensalista.objects.filter(
+            cliente_mensalista=cliente
+        ).order_by('-data_geracao').first() 
+
+        cobranca_pendente_para_email = CobrancaMensalista.objects.filter(
+            cliente_mensalista=cliente, 
+            status__in=['pendente', 'parcialmente_pago']
+        ).order_by('data_vencimento').first() 
+
+        cliente_dict = {
+            'obj': cliente, 
+            'ultima_cobranca': ultima_cobranca,
+            'cobranca_pendente_para_email': cobranca_pendente_para_email,
+        }
+        clientes_com_cobrancas.append(cliente_dict)
+
+    paginator = Paginator(clientes_com_cobrancas, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    if not page_obj.object_list and (query_nome or query_placa or status_filter != 'todos'): 
-        messages.info(request, "Nenhum cliente mensalista encontrado com os filtros informados.")
-
     return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html', {
-        'titulo_pagina': 'Clientes Mensalistas',
-        'page_obj': page_obj,
+        'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
+        'page_obj': page_obj, 
         'query_nome': query_nome,
         'status_filter': status_filter,
         'query_placa': query_placa,
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
     })
 
-def gerar_pagamentos_mensalistas_manual(request, cliente_id=None): 
-    """
-    Gerar Pagamentos Mensalistas.
-    """
+def gerar_pagamentos_mensalistas_manual(request, cliente_id): 
+    cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id) 
+
     initial_data = {}
-    cliente_mensalista_obj = None
+    if hasattr(cliente_mensalista_obj, 'plano') and cliente_mensalista_obj.plano:
+        try:
+            plano_do_cliente = Planos.objects.get(
+                nome=cliente_mensalista_obj.plano, 
+                tipo_plano='Mensalista', 
+                status='Ativo' 
+            )
+            initial_data['valor_devido'] = plano_do_cliente.valor 
+        except Planos.DoesNotExist:
+            messages.warning(request, f"Plano '{cliente_mensalista_obj.plano}' não encontrado ou não é um plano Mensalista. Preencha o valor manualmente.")
+            initial_data['valor_devido'] = Decimal('0.00') 
+    else:
+        messages.warning(request, "Cliente não possui plano definido ou válido. Preencha o valor manualmente.")
 
-    if cliente_id:
-        cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id)
-        initial_data['cliente_mensalista'] = cliente_mensalista_obj.id
-        
-        if hasattr(cliente_mensalista_obj, 'plano') and cliente_mensalista_obj.plano:
-            try:
-                plano_do_cliente = Planos.objects.get(
-                    nome=cliente_mensalista_obj.plano, 
-                    tipo_plano='Mensalista', 
-                    status='Ativo' 
-                )
-                initial_data['valor_devido'] = plano_do_cliente.valor 
-            except Planos.DoesNotExist:
-                messages.warning(request, f"Plano '{cliente_mensalista_obj.plano}' não encontrado ou não é um plano Mensalista. Preencha o valor manualmente.")
-                initial_data['valor_devido'] = Decimal('0.00') 
-        else:
-            messages.warning(request, "Cliente não possui plano definido ou válido. Preencha o valor manualmente.")
-
-        today = timezone.now().date()
-        initial_data['mes_referencia'] = today.strftime('%m/%Y')
+    today = timezone.now().date()
+    initial_data['mes_referencia'] = today.strftime('%m/%Y')
 
     if request.method == 'POST':
         form = GerarCobrancaMensalForm(request.POST, request=request) 
         if form.is_valid():
-            cliente_mensalista_id = form.cleaned_data['cliente_mensalista'] 
-            cliente_mensalista_obj_from_form = get_object_or_404(Mensalista, id=cliente_mensalista_id)
-
             mes_referencia_str = form.cleaned_data['mes_referencia']
             data_vencimento = form.cleaned_data['data_vencimento']
             valor_devido = form.cleaned_data['valor_devido']
 
+            if CobrancaMensalista.objects.filter(
+                cliente_mensalista=cliente_mensalista_obj, 
+                mes_referencia=mes_referencia_str,
+            ).exists():
+                messages.error(request, f"Já existe uma cobrança mensal para {cliente_mensalista_obj.nome} referente ao mês {mes_referencia_str}. Não será gerada novamente.")
+                return redirect('pagamentos:gerar_pagamentos_mensalistas_lista_clientes') 
+
             with transaction.atomic():
-                CobrancaMensalista.objects.create(
-                    cliente_mensalista=cliente_mensalista_obj_from_form, 
+                nova_cobranca = CobrancaMensalista.objects.create( 
+                    cliente_mensalista=cliente_mensalista_obj, 
                     mes_referencia=mes_referencia_str,
                     data_vencimento=data_vencimento,
                     valor_devido=valor_devido,
                     status='pendente',
                 )
-                messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj_from_form.nome} referente a {mes_referencia_str}.")
-            return redirect('pagamentos:listar_cobrancas_mensalistas')
+                messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
+
+            # Enviar E-mail AUTOMATICAMENTE após a Geração
+            try:
+                html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
+                plain_message = strip_tags(html_message)
+                send_mail(
+                    subject=f"ParkControl: Nova Cobrança Gerada #{nova_cobranca.id}",
+                    message=plain_message, from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[cliente_mensalista_obj.email], 
+                    html_message=html_message, fail_silently=False,
+                )
+                messages.info(request, f"E-mail de cobrança enviado para {cliente_mensalista_obj.email}.")
+            except Exception as e:
+                messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
+
+            return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
+
         else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    field_name = form[field].label or field
-                    messages.error(request, f"Erro no campo '{field_name}': {error}")
-            return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', {'form': form})
-    else:
+            return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', {'form': form, 'cliente': cliente_mensalista_obj}) 
+
+    else: 
         form = GerarCobrancaMensalForm(initial=initial_data, request=request)
 
-    context = {'form': form}
+    context = {'form': form, 'cliente': cliente_mensalista_obj} 
     return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
+
+def cobranca_gerada_confirmacao(request, cobranca_id):
+    cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+
+    try:
+         html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': cobranca})
+         plain_message = strip_tags(html_message)
+         send_mail(
+             subject=f"ParkControl: Nova Cobrança Gerada #{cobranca.id}",
+             message=plain_message, from_email=settings.DEFAULT_FROM_EMAIL,
+             recipient_list=[cobranca.cliente_mensalista.email], html_message=html_message, fail_silently=False,
+         )
+         messages.info(request, f"E-mail de cobrança enviado para {cobranca.cliente_mensalista.email}.")
+    except Exception as e:
+         messages.error(request, f"Erro ao enviar e-mail após geração: {e}.")
+    
+    return render(request, 'pagamentos/mensalistas/cobranca_gerada_confirmacao.html', {'cobranca': cobranca})
+
 
 def listar_cobrancas_diaristas(request):
     """
@@ -322,18 +355,12 @@ def listar_cobrancas_mensalistas(request):
     return render(request, 'pagamentos/mensalistas/listar_cobrancas_mensalistas.html', context)
 
 def detalhe_cobranca_mensalista(request, cobranca_id):
-    """
-    Exibe os detalhes de uma cobrança de mensalista específica.
-    """
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
     return render(request, 'pagamentos/mensalistas/detalhe_cobranca_mensalista.html', {'cobranca': cobranca})
 
 def editar_cobranca_mensalista_status(request, cobranca_id):
-    """
-    Permite ao contador editar o status e valor pago de uma cobrança de mensalista.
-    """
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
-    
+
     if request.method == 'POST':
         form = CobrancaMensalistaStatusForm(request.POST, instance=cobranca) 
         if form.is_valid():
@@ -351,7 +378,7 @@ def editar_cobranca_mensalista_status(request, cobranca_id):
                     messages.error(request, f"Erro no campo '{field_name}': {error}")
     else:
         form = CobrancaMensalistaStatusForm(instance=cobranca)
-    
+
     return render(request, 'pagamentos/mensalistas/editar_cobranca_mensalista_status.html', {'form': form, 'cobranca': cobranca})
 
 def excluir_cobranca_mensalista(request, cobranca_id):
@@ -426,6 +453,70 @@ def disparar_email_cobranca(request, cobranca_id):
         messages.error(request, f"Erro ao enviar e-mail: {e}. Verifique as configurações de e-mail.")
     
     return redirect('pagamentos:listar_cobrancas_para_email')
+
+def gerar_cobranca_imediata(request, cliente_id):
+    """
+    Gera uma cobrança mensal para o cliente especificado, envia e-mail e redireciona para confirmação/recibo.
+    Esta view substitui o fluxo do formulário para o botão "Gerar" direto da lista.
+    """
+    cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id)
+
+    # Lógica para calcular o valor da cobrança (similar ao initial_data do form)
+    valor_devido_calculado = Decimal('0.00')
+    if hasattr(cliente_mensalista_obj, 'plano') and cliente_mensalista_obj.plano:
+        try:
+            plano_do_cliente = Planos.objects.get(
+                nome=cliente_mensalista_obj.plano, 
+                tipo_plano='Mensalista', 
+                status='Ativo' 
+            )
+            valor_devido_calculado = plano_do_cliente.valor 
+        except Planos.DoesNotExist:
+            messages.warning(request, f"Plano '{cliente_mensalista_obj.plano}' não encontrado ou não é um plano Mensalista. Gerando com valor 0.")
+    else:
+        messages.warning(request, "Cliente não possui plano definido ou válido. Gerando cobrança com valor 0.")
+    
+    # Validação de unicidade e criação da cobrança
+    today = timezone.now().date()
+    mes_referencia_str = today.strftime('%m/%Y')
+    data_vencimento = today + timedelta(days=10) # Vence em 10 dias, por exemplo (importar timedelta)
+
+    # Adicione a importação de timedelta no topo do arquivo views.py
+    # from datetime import datetime, date, timedelta 
+
+    if CobrancaMensalista.objects.filter(
+        cliente_mensalista=cliente_mensalista_obj, 
+        mes_referencia=mes_referencia_str,
+    ).exists():
+        messages.error(request, f"Já existe uma cobrança mensal para {cliente_mensalista_obj.nome} referente ao mês {mes_referencia_str}. Não será gerada novamente.")
+        return redirect('pagamentos:gerar_pagamentos_mensalistas_lista_clientes') 
+
+    with transaction.atomic():
+        nova_cobranca = CobrancaMensalista.objects.create( 
+            cliente_mensalista=cliente_mensalista_obj, 
+            mes_referencia=mes_referencia_str,
+            data_vencimento=data_vencimento,
+            valor_devido=valor_devido_calculado,
+            status='pendente',
+        )
+        messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
+    
+    # Enviar E-mail AUTOMATICAMENTE após a Geração
+    try:
+        html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
+        plain_message = strip_tags(html_message)
+        send_mail(
+            subject=f"ParkControl: Nova Cobrança Gerada #{nova_cobranca.id}",
+            message=plain_message, from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cliente_mensalista_obj.email], 
+            html_message=html_message, fail_silently=False,
+        )
+        messages.info(request, f"E-mail de cobrança enviado para {cliente_mensalista_obj.email}.")
+    except Exception as e:
+        messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
+    
+    # Redirecionar para a tela de confirmação/recibo
+    return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
 
 def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
     """

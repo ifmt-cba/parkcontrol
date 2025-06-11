@@ -14,9 +14,9 @@
 </head>
 <body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
 
-    <header class="bg-danger py-2 px-4 d-flex justify-content-center">
+    <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
         <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
-        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
     <div class="container mt-3">
@@ -34,9 +34,11 @@
         <h1 class="text-danger fw-bold mb-5">Editar Status da Cobrança #{{ cobranca.id }}</h1>
 
         <div class="container bg-light p-4 rounded-4 shadow-sm text-start">
-            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.nome }}</p>
+            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.nome }}</p> 
+            <p><strong>Plano do Cliente:</strong> {{ cobranca.cliente_mensalista.plano|default:"N/A" }}</p>
             <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
             <p><strong>Valor Devido:</strong> R$ {{ cobranca.valor_devido|floatformat:2 }}</p>
+            <p><strong>Valor Pago Atualmente:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
             <p><strong>Status Atual:</strong> <span class="badge bg-secondary">{{ cobranca.get_status_display }}</span></p>
 
             <form method="post" class="mt-4">

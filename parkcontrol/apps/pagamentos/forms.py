@@ -12,12 +12,6 @@ from decimal import Decimal
 from django.contrib import messages
 
 class GerarCobrancaMensalForm(forms.Form):
-    cliente_mensalista = forms.ModelChoiceField(
-        queryset=Mensalista.objects.filter(ativo=True),
-        label="Cliente Mensalista",
-        empty_label="Selecione um cliente mensalista",
-        error_messages={'required': 'Selecione um cliente mensalista para gerar a cobrança.'}
-    )
 
     mes_referencia = forms.CharField(
         max_length=7,
@@ -49,39 +43,9 @@ class GerarCobrancaMensalForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        cliente_mensalista_obj = cleaned_data.get('cliente_mensalista')
         mes_referencia_str = cleaned_data.get('mes_referencia')
         valor_digitado = cleaned_data.get('valor_devido')
 
-        from apps.planos.models import Planos as PlanosApp 
-
-        if cliente_mensalista_obj and cliente_mensalista_obj.plano:
-            try:
-                plano_do_cliente = PlanosApp.objects.get(
-                    nome=cliente_mensalista_obj.plano, 
-                    tipo_plano='Mensalista', 
-                    status='Ativo' 
-                )
-                valor_plano_esperado = plano_do_cliente.valor 
-                
-                if valor_digitado and valor_digitado != valor_plano_esperado:
-                    messages.warning(self.request, f"Atenção: O valor informado (R$ {valor_digitado:.2f}) é diferente do valor do plano (R$ {valor_plano_esperado:.2f}).")
-            except PlanosApp.DoesNotExist:
-                messages.warning(self.request, f"Atenção: O plano '{cliente_mensalista_obj.plano}' do cliente não foi encontrado ou está inativo. Preencha o valor manualmente.")
-            except Exception as e:
-                 messages.error(self.request, "Erro ao verificar o plano: %s" % str(e))
-        else:
-            messages.warning(self.request, "Atenção: Cliente não possui plano definido ou válido. Preencha o valor manualmente.")
-
-        if cliente_mensalista_obj and mes_referencia_str:
-            if CobrancaMensalista.objects.filter(
-                cliente_mensalista=cliente_mensalista_obj,
-                mes_referencia=mes_referencia_str,
-            ).exists():
-                raise ValidationError(
-                    f"Já existe uma cobrança mensal para {cliente_mensalista_obj.nome} referente ao mês {mes_referencia_str}."
-                )
-        
         return cleaned_data
     
     def __init__(self, *args, **kwargs):

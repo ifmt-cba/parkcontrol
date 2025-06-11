@@ -1,6 +1,6 @@
 {# apps/pagamentos/templates/pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html #}
 {% load static %}
-{% load form_tags %} {# Para o filtro add_class, se você o tiver em templatetags #}
+{% load form_tags %} 
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -14,9 +14,9 @@
 </head>
 <body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
 
-    <header class="bg-danger py-2 px-4 d-flex justify-content-center">
+    <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
         <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
-        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
     <div class="container mt-3">
@@ -36,16 +36,14 @@
         <div class="container bg-light p-4 rounded-4 shadow-sm">
             <form method="post">
                 {% csrf_token %}
-                
+
+                {# NOVO: Exibir o nome do cliente selecionado, sem o dropdown #}
+                {% if cliente %}
                 <div class="mb-3">
-                    <label for="{{ form.cliente_mensalista.id_for_label }}" class="form-label text-start d-block">
-                        {{ form.cliente_mensalista.label }} <span class="text-danger">*</span>
-                    </label>
-                    {{ form.cliente_mensalista|add_class:"form-select" }} 
-                    {% for error in form.cliente_mensalista.errors %}
-                        <div class="text-danger small text-start">{{ error }}</div>
-                    {% endfor %}
+                    <label class="form-label text-start d-block">Cliente Selecionado:</label>
+                    <p class="form-control-static text-start fw-bold">{{ cliente.nome }} ({{ cliente.placa }})</p>
                 </div>
+                {% endif %}
 
                 <div class="mb-3">
                     <label for="{{ form.mes_referencia.id_for_label }}" class="form-label text-start d-block">
@@ -96,7 +94,3 @@
     <footer class="pb-4">
         <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>

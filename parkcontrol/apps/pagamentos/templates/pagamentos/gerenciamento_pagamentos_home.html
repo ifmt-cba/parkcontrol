@@ -15,7 +15,7 @@
 
     <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
         <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
-        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
     <div class="container mt-3">
@@ -54,7 +54,7 @@
     </main>
 
     <footer class="pb-4">
-        <a href="{% url 'home_parkcontrol' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+        <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

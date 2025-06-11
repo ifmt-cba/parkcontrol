@@ -7,16 +7,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes da Cobrança #{{ cobranca.id }} - ParkControl</title>
+    <title>Visualização do Pagamento - ParkControl</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
 
-    <header class="bg-danger py-2 px-4 d-flex justify-content-center">
+    <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
         <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
-        <a href="{% url 'logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
     <div class="container mt-3">
@@ -31,19 +31,29 @@
     </div>
 
     <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
-        <h1 class="text-danger fw-bold mb-5">Detalhes da Cobrança #{{ cobranca.id }}</h1>
+        <h1 class="text-danger fw-bold mb-5">Detalhe da Cobrança: {{ cobranca.cliente_mensalista.nome }}</h1> 
 
-        <div class="container bg-light p-4 rounded-4 shadow-sm text-start">
-            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.nome }}</p>
-            <p><strong>Plano:</strong> {{ cobranca.cliente_mensalista.plano.nome_plano|default:"N/A" }}</p>
-            <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
-            <p><strong>Data de Geração:</strong> {{ cobranca.data_geracao|date:"d/m/Y H:i" }}</p>
-            <p><strong>Data de Vencimento:</strong> {{ cobranca.data_vencimento|date:"d/m/Y" }}</p>
-            <p><strong>Valor Devido:</strong> R$ {{ cobranca.valor_devido|floatformat:2 }}</p>
-            <p><strong>Valor Pago:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
-            <p><strong>Status:</strong> {{ cobranca.get_status_display }}</p>
-            <p><strong>Data do Pagamento:</strong> {{ cobranca.data_pagamento|date:"d/m/Y H:i"|default:"Não pago" }}</p>
-            <p><strong>Descrição:</strong> {{ cobranca.descricao|default:"N/A" }}</p>
+        <div class="container bg-light p-4 rounded-4 shadow-sm text-start" style="max-width: 400px;">
+            <div class="mb-3">
+                <p class="mb-1"><strong>Mês de Referência</strong></p>
+                <p class="form-control-static">{{ cobranca.mes_referencia }}</p>
+            </div>
+            <div class="mb-3">
+                <p class="mb-1"><strong>Valor da Fatura</strong></p>
+                <p class="form-control-static">R$ {{ cobranca.valor_devido|floatformat:2 }}</p>
+            </div>
+            <div class="mb-3">
+                <p class="mb-1"><strong>Vencimento da Fatura</strong></p>
+                <p class="form-control-static">{{ cobranca.data_vencimento|date:"d/m/Y" }}</p>
+            </div>
+            <div class="mb-3">
+                <p class="mb-1"><strong>Status do Pagamento</strong></p>
+                <p class="form-control-static">{{ cobranca.get_status_display }}</p>
+            </div>
+            <div class="mb-3">
+                <p class="mb-1"><strong>Plano do Cliente</strong></p>
+                <p class="form-control-static">{{ cobranca.cliente_mensalista.plano|default:"N/A" }}</p>
+            </div>
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
@@ -60,7 +70,7 @@
     </main>
 
     <footer class="pb-4">
-        <a href="{% url 'pagamentos:listar_cobrancas_mensalistas' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar para a Lista</a>
+        <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar para a Lista de Clientes</a>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
