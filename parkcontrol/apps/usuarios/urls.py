@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import views_autenticacao, views_dashboard, views_gerencia_usuario
+from .views import views_autenticacao, views_dashboard, views_gerencia_usuario, views_perfil
 
 # URL patterns for the usuarios app
 # This file defines the URL patterns for the usuarios app in a Django project.
@@ -21,5 +21,11 @@ urlpatterns = [
     path('register/', views_gerencia_usuario.register_parkcontrol, name='register_parkcontrol'), # Registration page
     path('editar_usuario/<int:usuario_id>/', views_gerencia_usuario.editar_usuario, name='editar_usuario'),
     path('excluir_usuario/<int:usuario_id>/', views_gerencia_usuario.excluir_usuario, name='excluir_usuario'),
+
+    # perfil
+    path('meu_perfil/', views_perfil.perfil_usuario, name='perfil_usuario'),
+    path('editar_perfil/', views_perfil.editar_perfil_usuario, name='editar_perfil_usuario'),
+    path('alterar_senha/', views_perfil.alterar_senha_usuario, name='alterar_senha_usuario'),
+
 
 ]
