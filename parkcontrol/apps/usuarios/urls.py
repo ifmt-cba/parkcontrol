@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import views_autenticacao, views_dashboard, views_gerencia_usuario, views_perfil
 
+
+app_name = "usuarios"  # Define o namespace para o app usuarios
+
 # URL patterns for the usuarios app
 # This file defines the URL patterns for the usuarios app in a Django project.
 urlpatterns = [

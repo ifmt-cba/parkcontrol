@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %}Editar Clientes Mensalistas{% endblock %}
+
+{% block extra_head %}    
+<link rel="stylesheet" href="{% static 'clientes/css/cadastro_mensalista.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main class="container my-5 flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <h1 class="text-danger fw-bold mb-5">Editar Clientes Mensalista</h1>
+
+            {% if messages %}
+                <div class="container mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        <div class="form-container-wrapper">
+            <form action="{% url 'clientes:editar_mensalista' pk=mensalista.pk %}" method="POST">
+                {% csrf_token %}
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                        {{ form.nome|add_class:"form-control" }}
+                        {% if form.nome.errors %}<div class="text-danger small mt-1">{{ form.nome.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                        {{ form.telefone|add_class:"form-control" }}
+                        {% if form.telefone.errors %}<div class="text-danger small mt-1">{{ form.telefone.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">E-mail</label>
+                        {{ form.email|add_class:"form-control" }}
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.plano.id_for_label }}" class="form-label">Selecionar Plano</label>
+                        {{ form.plano|add_class:"form-select" }}
+                        {% if form.plano.errors %}<div class="text-danger small mt-1">{{ form.plano.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.placa.id_for_label }}" class="form-label">Placa</label>
+                        {{ form.placa|add_class:"form-control" }}
+                        {% if form.placa.errors %}<div class="text-danger small mt-1">{{ form.placa.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5">
+                    <a href="{% url 'clientes:cliente_mensalista' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+                    <button type="submit" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+{% endblock %}

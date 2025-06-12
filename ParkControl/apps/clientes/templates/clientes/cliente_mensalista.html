@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Clientes Mensalistas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'clientes/css/cliente_mensalista.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <h1 class="text-danger fw-bold mb-5">Clientes Mensalistas</h1>
+
+        <!-- Formulário de busca -->
+      <div class="container mt-4">
+            <form method="GET" class="row g-2 mb-4 justify-content-center">
+                <div class="col-md-4">
+                    <input type="text" name="nome" class="form-control" placeholder="Buscar por nome" value="{{ request.GET.nome }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="placa" class="form-control" placeholder="Buscar por placa" value="{{ request.GET.placa }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Filtrar</button>
+                </div>
+            </form>
+
+            <!-- Quantidade de clientes encontrados -->
+            <p class="text-center fw-bold">
+                {{ mensalistas|length }} cliente{{ mensalistas|length|pluralize }} encontrado{{ mensalistas|length|pluralize }}
+            </p>
+            
+            <!-- Tabela -->
+            <div class="table-responsive">
+                {% if mensalistas %}
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>Placa</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in mensalistas %}
+                        <tr>
+                            <td data-label="Nome">{{ cliente.nome }}</td>
+                            <td data-label="E-mail">{{ cliente.email }}</td>
+                            <td data-label="Telefone">{{ cliente.telefone }}</td>
+                            <td data-label="Placa">{{ cliente.placa }}</td>
+                            <td data-label="Status">
+                                {% if cliente.ativo %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Ações">
+                                <a href="{% url 'clientes:editar_mensalista' pk=cliente.pk %}" class="btn btn-outline-danger btn-sm">Editar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">Nenhum cliente encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center fw-bold text-muted">Nenhum cliente encontrado.</p> {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-4">
+        <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+    </footer>
+{% endblock %}

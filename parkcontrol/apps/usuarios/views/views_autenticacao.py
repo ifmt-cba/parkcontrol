@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import user_passes_test # Import user_passes
 
 # Redirect to login page
 def redirect_to_login(request):
-    return redirect('login_parkcontrol')  
+    return redirect('usuarios:login_parkcontrol')  
 
 '''
 
@@ -48,14 +48,14 @@ def login_parkcontrol(request):
             perfil = getattr(user, 'perfil_acesso', None)
 
             if perfil == 'Administrador':
-                return redirect('dashboard_administrador')
+                return redirect('usuarios:dashboard_administrador')
             elif perfil == 'Frentista':
-                return redirect('dashboard_frentista')
+                return redirect('usuarios:dashboard_frentista')
             elif perfil == 'Contador':
-                return redirect('dashboard_contador')
+                return redirect('usuarios:dashboard_contador')
             else:
                 messages.warning(request, 'Perfil de acesso não identificado.')
-                return redirect('login_parkcontrol')
+                return redirect('usuarios:login_parkcontrol')
         else:
             messages.error(request, 'E-mail ou senha inválidos.')
             return render(request, 'autenticacao/login.html')
@@ -67,3 +67,27 @@ def logout_parkcontrol(request):
     logout(request)    
     return render(request, 'autenticacao/logout.html')
 
+
+'''
+
+    DASHBOARD
+
+'''
+
+# Dashboard for Administrador
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_administrador, login_url='login_parkcontrol')
+def dashboard_administrador(request):
+    return render(request, 'usuarios/administrador/dashboard_administrador.html')
+
+# Dashboard for Contador
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_contador, login_url='login_parkcontrol')
+def dashboard_contador(request):
+    return render(request, 'usuarios/contador/dashboard_contador.html')
+
+# Dashboard for Frentista
+@login_required(login_url='login_parkcontrol')
+@user_passes_test(is_frentista, login_url='login_parkcontrol')
+def dashboard_frentista(request):
+    return render(request, 'usuarios/frentista/dashboard_frentista.html')
