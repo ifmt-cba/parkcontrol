@@ -1,0 +1,15 @@
+/* Estilo opcional para botões */
+.btn-outline-danger {
+    font-size: 16px;
+    line-height: 1.4;
+    transition: transform 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #fcebeb;
+    transform: translateY(-2px);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+}

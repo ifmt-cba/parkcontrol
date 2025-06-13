@@ -1,0 +1,55 @@
+header {
+  background-color: #ed1c24;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.logo {
+  height: 40px;
+}
+
+.sair-btn {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.custom-btn {
+    background-color: #ed1c24;
+    color: #fff;
+    border: 2px solid #ed1c24;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.custom-btn:hover {
+    background-color: #fff;
+    color: #ed1c24;
+    transform: translateY(-2px);
+}
+
+main {
+  height: calc(100vh - 60px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 280px;
+}
+
+@media(min-width: 768px) {
+  .buttons {
+    flex-direction: row;
+    width: auto;
+  }
+}

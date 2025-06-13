@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+}
+
+h1 {
+  color: red;
+}
+
+form {
+  display: inline-block;
+  text-align: left;
+  margin-top: 30px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: 300px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid black;
+  margin-bottom: 20px;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+.mensagem {
+  margin-top: 20px;
+  font-weight: bold;
+}
+.mensagem.sucesso {
+  color: green;
+}
+.mensagem.erro {
+  color: red;
+}

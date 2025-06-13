@@ -1,0 +1,39 @@
+.logo {
+    height: 40px;
+}
+/* ALERTAS PERSONALIZADOS */
+
+.custom-alert {
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Sucesso */
+.alert-success {
+    background-color: #d1f7d6;
+    color: #1a7f2f;
+    border: 1px solid #7dd693;
+}
+
+/* Erro */
+.alert-error,
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+/* Botão de fechar */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #000;
+    opacity: 0.6;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+}
