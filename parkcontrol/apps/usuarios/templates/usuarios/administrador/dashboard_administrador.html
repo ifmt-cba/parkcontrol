@@ -10,24 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
-        <div class="container-fluid">
-            <!-- Imagem/Logo à esquerda -->
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="{% static 'images/logo-branca.png' %}" alt="Logo" class="me-2" style="height: 40px;">
-            </a>
-
-            <!-- Direita: tipo de usuário + ícone perfil + botão sair -->
-            <div class="d-flex align-items-center">
-                <!-- Link para o perfil -->
-                <a href="{% url 'perfil_usuario' %}" class="text-white text-decoration-none me-3 d-flex align-items-center">
-                    <i class="bi bi-person-circle me-1 fs-5"></i> Administrador
-                </a>
-                <!-- Botão sair -->
-                <a class="btn btn-outline-light btn-sm" href="{% url 'logout_parkcontrol' %}">Sair</a>
-            </div>
-        </div>
-    </nav>
 
 
 
@@ -40,7 +22,7 @@
             <a href="#" class="btn btn-danger btn-lg flex-fill">
                 <i class="fas fa-file-alt me-2"></i> Gerência Relatórios
             </a>
-            <a href="{% url 'gerencia_usuarios' %}" class="btn btn-danger btn-lg flex-fill">
+            <a href="{% url 'usuarios:gerencia_usuarios' %}" class="btn btn-danger btn-lg flex-fill">
                 <i class="fas fa-users-cog me-2"></i> Gerência de Usuários
             </a>
             <a href="#" class="btn btn-danger btn-lg flex-fill">

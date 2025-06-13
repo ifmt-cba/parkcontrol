@@ -88,7 +88,7 @@ def editar_diarista_view(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Cliente diarista atualizado com sucesso!')
-            return redirect('cliente_diarista') 
+            return redirect('clientes:cliente_diarista') 
         else:
             messages.error(request, 'Erro ao atualizar cliente. Verifique os dados informados.')
     else:

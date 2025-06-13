@@ -6,13 +6,13 @@ from django.shortcuts import render, redirect
 from apps.usuarios.models import Usuario
 
 # Página principal do perfil
-@login_required(login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
 def perfil_usuario(request):
     return render(request, 'perfil/perfil_usuario.html')
 
 
 # View para editar nome e e-mail
-@login_required(login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
 def editar_perfil_usuario(request):
     if request.method == 'POST':
         user = request.user
@@ -21,19 +21,19 @@ def editar_perfil_usuario(request):
 
         if Usuario.objects.exclude(id=user.id).filter(email=email).exists():
             messages.error(request, 'Já existe um usuário com este e-mail.')
-            return redirect('perfil_usuario')
+            return redirect('usuarios:perfil_usuario')
 
         user.first_name = nome
         user.email = email
         user.save()
         messages.success(request, 'Perfil atualizado com sucesso.')
-        return redirect('perfil_usuario')
+        return redirect('usuarios:perfil_usuario')
     else:
-        return redirect('perfil_usuario')
+        return redirect('usuarios:perfil_usuario')
 
 
 # View para alterar senha
-@login_required(login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
 def alterar_senha_usuario(request):
     if request.method == 'POST':
         user = request.user
@@ -43,20 +43,20 @@ def alterar_senha_usuario(request):
 
         if not check_password(senha_atual, user.password):
             messages.error(request, 'Senha atual incorreta.')
-            return redirect('perfil_usuario')
+            return redirect('usuarios:perfil_usuario')
 
         if nova_senha != confirmar:
             messages.error(request, 'A nova senha e a confirmação não coincidem.')
-            return redirect('perfil_usuario')
+            return redirect('usuarios:perfil_usuario')
 
         if len(nova_senha) < 8:
             messages.warning(request, 'A nova senha deve conter pelo menos 8 caracteres.')
-            return redirect('perfil_usuario')
+            return redirect('usuarios:perfil_usuario')
 
         user.set_password(nova_senha)
         user.save()
         update_session_auth_hash(request, user)  # mantém o login ativo após trocar a senha
         messages.success(request, 'Senha alterada com sucesso.')
-        return redirect('perfil_usuario')
+        return redirect('usuarios:perfil_usuario')
 
-    return redirect('perfil_usuario')
+    return redirect('usuarios:perfil_usuario')

@@ -5,8 +5,8 @@ from apps.usuarios.models import Usuario
 from django.contrib import messages
 
 
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def gerencia_usuarios(request):
     usuarios = Usuario.objects.all().order_by('id')
 
@@ -33,8 +33,8 @@ def gerencia_usuarios(request):
 
 
 
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def register_parkcontrol(request):
     if request.method == 'POST':
         username = request.POST.get('username')  # email
@@ -45,7 +45,7 @@ def register_parkcontrol(request):
 
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, "Já existe um usuário com este e-mail.")
-            return redirect('register_parkcontrol')
+            return redirect('usuarios:register_parkcontrol')
 
         user = Usuario.objects.create_user(
             username=username,
@@ -56,7 +56,7 @@ def register_parkcontrol(request):
         )
         user.save()
         messages.success(request, f"Usuário {user.first_name} ({user.perfil_acesso}) cadastrado com sucesso!")
-        return redirect('gerencia_usuarios')
+        return redirect('usuarios:gerencia_usuarios')
 
     return render(request, 'usuarios/administrador/register.html')
 
@@ -64,8 +64,8 @@ def register_parkcontrol(request):
 
 
 # EDITAR USUÁRIO
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def editar_usuario(request, usuario_id):
     usuario = Usuario.objects.get(id=usuario_id)
 
@@ -77,7 +77,7 @@ def editar_usuario(request, usuario_id):
 
         usuario.save()
         messages.success(request, f"Usuário {usuario.first_name} atualizado com sucesso!")
-        return redirect('gerencia_usuarios')
+        return redirect('usuarios:gerencia_usuarios')
 
     return render(request, 'usuarios/administrador/editar_usuario.html', {
         'usuario': usuario
@@ -85,10 +85,10 @@ def editar_usuario(request, usuario_id):
 
 
 # EXCLUIR USUÁRIO
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def excluir_usuario(request, usuario_id):
     usuario = Usuario.objects.get(id=usuario_id)
     usuario.delete()
     messages.success(request, f"Usuário {usuario.first_name} excluído com sucesso!")
-    return redirect('gerencia_usuarios')
+    return redirect('usuarios:gerencia_usuarios')

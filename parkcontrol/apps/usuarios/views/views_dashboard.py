@@ -10,19 +10,19 @@ from .views_autenticacao import is_administrador, is_contador, is_frentista # Im
 '''
 
 # Dashboard for Administrador
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def dashboard_administrador(request):
     return render(request, 'usuarios/administrador/dashboard_administrador.html')
 
 # Dashboard for Contador
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_contador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_contador, login_url='usuarios:login_parkcontrol')
 def dashboard_contador(request):
     return render(request, 'usuarios/contador/dashboard_contador.html')
 
 # Dashboard for Frentista
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_frentista, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_frentista, login_url='usuarios:login_parkcontrol')
 def dashboard_frentista(request):
     return render(request, 'usuarios/frentista/dashboard_frentista.html')

@@ -1,0 +1,30 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container-fluid">
+        <!-- Logo à esquerda -->
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{% static 'images/logo-branca.png' %}" alt="Logo" class="me-2" style="height: 40px;">
+        </a>
+
+        <!-- Botão do menu responsivo -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Conteúdo da Navbar -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <div class="ms-auto d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <!-- Nome do usuário -->
+                    <a href="{% url 'usuarios:perfil_usuario' %}" class="text-white text-decoration-none me-3 d-flex align-items-center">
+                        <i class="bi bi-person-circle me-1 fs-5"></i>
+                        {{ user.get_full_name|default:user.username }}
+                    </a>
+                    <!-- Botão Sair -->
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'usuarios:logout_parkcontrol' %}">Sair</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
