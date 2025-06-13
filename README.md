@@ -1,7 +1,7 @@
 # ParkControl – Sistema de Gestão de Estacionamentos
 
 <div align="center">
-  <img src="parkcontrol/static/images/logo.png" alt="Logo ParkControl" width="200"/>
+  <img src="parkcontrol/static/images/logo.png" alt="Logo ParkControl"/>
 </div>
 
 ---
