@@ -7,7 +7,12 @@ app_name = "usuarios"  # Define o namespace para o app usuarios
 # URL patterns for the usuarios app
 # This file defines the URL patterns for the usuarios app in a Django project.
 urlpatterns = [
+
+    # Redirecionamento para a página de login
     path("", views_autenticacao.redirect_to_login, name="redirect_to_login"), # Redirect to login
+
+    # Redirecionamento para a página inicial
+    path('home/', views_dashboard.home_redirect, name='home'), # Redirect to home based on user profile
 
     # autenticacao
     path("login/", views_autenticacao.login_parkcontrol, name="login_parkcontrol"), # Login page 
@@ -29,6 +34,5 @@ urlpatterns = [
     path('meu_perfil/', views_perfil.perfil_usuario, name='perfil_usuario'),
     path('editar_perfil/', views_perfil.editar_perfil_usuario, name='editar_perfil_usuario'),
     path('alterar_senha/', views_perfil.alterar_senha_usuario, name='alterar_senha_usuario'),
-
 
 ]

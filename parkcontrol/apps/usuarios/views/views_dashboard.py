@@ -9,6 +9,22 @@ from .views_autenticacao import is_administrador, is_contador, is_frentista # Im
 
 '''
 
+
+@login_required(login_url='usuarios:login_parkcontrol')
+def home_redirect(request):
+    perfil = getattr(request.user, 'perfil_acesso', None)
+
+    if perfil == 'Administrador':
+        return redirect('usuarios:dashboard_administrador')
+    elif perfil == 'Frentista':
+        return redirect('usuarios:dashboard_frentista')
+    elif perfil == 'Contador':
+        return redirect('usuarios:dashboard_contador')
+    else:
+        # Fallback, caso o perfil não esteja definido
+        return redirect('usuarios:login_parkcontrol')
+
+
 # Dashboard for Administrador
 @login_required(login_url='usuarios:login_parkcontrol')
 @user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
