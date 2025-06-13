@@ -6,14 +6,10 @@ from . import views
 app_name = 'pagamentos'
 
 urlpatterns = [
-     # --- Home do Módulo de Gerenciamento de Pagamentos (Contador) ---
     path('gerenciar/', views.gerenciamento_pagamentos_home, name='gerenciamento_pagamentos_home'),
-    
-    # --- URL para a tela de "Clientes Ativos" que será usada para Gerar Pagamentos ---
     path('mensalistas/gerar-por-cliente/', views.gerar_pagamentos_mensalistas_lista_clientes, name='gerar_pagamentos_mensalistas_lista_clientes'),
-    
-    # --- URL para o FORMULÁRIO de geração de cobrança manual ---
     path('mensalistas/gerar-manual/<int:cliente_id>/', views.gerar_pagamentos_mensalistas_manual, name='gerar_pagamentos_mensalistas_manual_com_cliente'),
+    path('mensalistas/gerar-imediata/<int:cliente_id>/', views.gerar_cobranca_imediata, name='gerar_cobranca_imediata'),
     path('listagem-geral-redirect/', views.listagem_pagamentos_geral_redirect, name='listagem_pagamentos_geral_redirect'),
     path('movimento/<int:movimento_id>/encerrar/', views.registrar_saida_e_cobrar, name='registrar_saida_e_cobrar'),
     path('diarista/<int:cobranca_id>/pagar/', views.registrar_pagamento_diarista, name='registrar_pagamento_diarista'),
@@ -27,6 +23,6 @@ urlpatterns = [
     path('mensalistas/<int:cobranca_id>/excluir/', views.excluir_cobranca_mensalista, name='excluir_cobranca_mensalista'),
     path('mensalistas/enviar-email-lista/', views.listar_cobrancas_para_email, name='listar_cobrancas_para_email'),
     path('mensalistas/disparar-email/<int:cobranca_id>/', views.disparar_email_cobranca, name='disparar_email_cobranca'),
-    path('mensalistas/cobranca-gerada/<int:cobranca_id>/', views.cobranca_gerada_confirmacao, name='cobranca_gerada_confirmacao'),
+    path('cobranca-gerada/<int:cobranca_id>/', views.cobranca_gerada_confirmacao, name='cobranca_gerada_confirmacao'),
     path('recibo/<str:tipo_cobranca_str>/<int:cobranca_id>/', views.emitir_recibo, name='emitir_recibo'),
 ]

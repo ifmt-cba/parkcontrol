@@ -23,8 +23,6 @@
         <div class="container bg-white p-5 rounded-4 shadow-lg" style="max-width: 600px; border: 1px solid #ddd;">
             <h2 class="text-center text-danger mb-4">RECIBO DE PAGAMENTO</h2>
             
-            <p class="text-end mb-4"><strong>Data de Emissão:</strong> {{ data_emissao|date:"d/m/Y H:i" }}</p>
-
             <div class="text-start mb-4">
                 <p><strong>Recebemos de:</strong>
                     {% if tipo_cobranca == 'mensalista' %}
@@ -37,20 +35,17 @@
                 <p><strong>A quantia de:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
                 <p><strong>Referente a:</strong> {{ cobranca.get_status_display }} da Cobrança #{{ cobranca.id }}</p>
                 {% if tipo_cobranca == 'mensalista' %}
-                    <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
+                <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
                 {% else %}
                     <p><strong>Movimento:</strong> Entrada: {{ cobranca.movimento.hora_entrada|date:"d/m/Y H:i" }} / Saída: {{ cobranca.movimento.hora_saida|date:"d/m/Y H:i" }}</p>
                 {% endif %}
+                <p><strong>Data de Emissão:</strong> {{ data_emissao|date:"d/m/Y H:i" }}</p>
             </div>
 
             <h3 class="text-center text-danger my-4">VALOR TOTAL PAGO: R$ {{ cobranca.valor_pago|floatformat:2 }}</h3>
 
             <div class="text-center mt-5">
-                <p>_____________________________________</p>
-                <p>Assinatura do Recebedor</p>
                 <p class="mt-4"><strong>{{ nome_estacionamento }}</strong></p>
-                <p>{{ endereco_estacionamento }}</p>
-                <p>CNPJ: {{ cnpj_estacionamento }}</p>
             </div>
         </div>
     </main>

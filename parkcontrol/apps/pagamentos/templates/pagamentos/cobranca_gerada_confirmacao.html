@@ -17,15 +17,23 @@
         <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
     </header>
 
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
         <h1 class="text-success fw-bold mb-5"><i class="bi bi-check-circle-fill me-2"></i> Cobrança Gerada com Sucesso!</h1>
 
         {% if cobranca %}
             <div class="container bg-light p-4 rounded-4 shadow-sm text-start" style="max-width: 600px;">
-                <p class="lead">
-                    Detalhes da Cobrança 
-                    #{{ cobranca.id }} {{ cobranca.cliente_mensalista.nome }}:
-                </p>
+                <p class="lead">Detalhes da Cobrança #{{ cobranca.id }} para {{ cobranca.cliente_mensalista.nome }}:</p>
                 <ul class="list-unstyled">
                     <li><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</li>
                     <li><strong>Valor Devido:</strong> R$ {{ cobranca.valor_devido|floatformat:2 }}</li>
@@ -33,7 +41,7 @@
                     <li><strong>Status:</strong> {{ cobranca.get_status_display }}</li>
                 </ul>
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    <a href="{% url 'pagamentos:emitir_recibo' cobranca.id %}" class="btn btn-primary px-4 py-2 rounded-4 fw-bold">
+                    <a href="{% url 'pagamentos:emitir_recibo' 'mensalista' cobranca.id %}" class="btn btn-primary px-4 py-2 rounded-4 fw-bold">
                         <i class="bi bi-receipt me-2"></i> Emitir Recibo
                     </a>
                 </div>

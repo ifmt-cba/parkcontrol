@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.core.paginator import Paginator
 from decimal import Decimal
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import calendar
 import re 
 
@@ -39,7 +39,7 @@ def registrar_saida_e_cobrar(request, movimento_id):
             cobranca_existente = CobrancaDiarista.objects.get(movimento=movimento)
             return redirect('pagamentos:detalhe_cobranca_diarista', cobranca_id=cobranca_existente.id)
         except CobrancaDiarista.DoesNotExist:
-            return redirect('alguma_url_detalhe_movimento')
+            return redirect('pagamentos:gerenciamento_pagamentos_home')
 
 
     if request.method == 'POST':
@@ -102,9 +102,13 @@ def listagem_pagamentos_geral_redirect(request):
     return redirect('pagamentos:listar_cobrancas_mensalistas') 
 
 def gerar_pagamentos_mensalistas_lista_clientes(request):
+    """
+    Lista clientes Mensalista
+    """
     query_nome = request.GET.get('nome_cliente', '').strip()
     status_filter = request.GET.get('status', 'ativo').strip()
     query_placa = request.GET.get('placa_veiculo', '').strip()
+
     clientes_base_query = Mensalista.objects.all().order_by('nome') 
 
     clientes_filtrados = clientes_base_query
@@ -112,13 +116,13 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         clientes_filtrados = clientes_filtrados.filter(ativo=True)
     elif status_filter == 'inativo':
         clientes_filtrados = clientes_filtrados.filter(ativo=False)
-
+    
     if query_nome:
         clientes_filtrados = clientes_filtrados.filter(nome__icontains=query_nome) 
 
     if query_placa:
         clientes_filtrados = clientes_filtrados.filter(placa__icontains=query_placa)
-
+    
     clientes_com_cobrancas = []
     for cliente in clientes_filtrados: 
         ultima_cobranca = CobrancaMensalista.objects.filter(
@@ -133,7 +137,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         cliente_dict = {
             'obj': cliente, 
             'ultima_cobranca': ultima_cobranca,
-            'cobranca_pendente_para_email': cobranca_pendente_para_email,
+            'cobranca_pendente_para_email': cobranca_pendente_para_email, 
         }
         clientes_com_cobrancas.append(cliente_dict)
 
@@ -195,7 +199,6 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
                 )
                 messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
 
-            # Enviar E-mail AUTOMATICAMENTE após a Geração
             try:
                 html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
                 plain_message = strip_tags(html_message)
@@ -235,7 +238,7 @@ def cobranca_gerada_confirmacao(request, cobranca_id):
     except Exception as e:
          messages.error(request, f"Erro ao enviar e-mail após geração: {e}.")
     
-    return render(request, 'pagamentos/mensalistas/cobranca_gerada_confirmacao.html', {'cobranca': cobranca})
+    return render(request, 'pagamentos/cobranca_gerada_confirmacao.html', {'cobranca': cobranca})
 
 
 def listar_cobrancas_diaristas(request):
@@ -352,7 +355,7 @@ def listar_cobrancas_mensalistas(request):
         'status_filter': status_filter,
         'status_choices': CobrancaMensalista.STATUS_CHOICES + [('todos', 'Todos')],
     }
-    return render(request, 'pagamentos/mensalistas/listar_cobrancas_mensalistas.html', context)
+    return render(request, 'pagamentos/mensalistas/listar_cobrancas.html', context)
 
 def detalhe_cobranca_mensalista(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
@@ -396,7 +399,6 @@ def listar_cobrancas_para_email(request):
     """
     Lista as cobranças de mensalistas que estão "Em aberto" (pendentes ou parcialmente pagas)
     para o contador poder enviar e-mail de cobrança.
-    RN01 - Somente pagamentos com status "Pendente" ou "Parcialmente Pago" (em aberto) devem ser exibidos.
     """
     query_nome = request.GET.get('nome_cliente', '').strip()
     
@@ -476,14 +478,9 @@ def gerar_cobranca_imediata(request, cliente_id):
     else:
         messages.warning(request, "Cliente não possui plano definido ou válido. Gerando cobrança com valor 0.")
     
-    # Validação de unicidade e criação da cobrança
     today = timezone.now().date()
     mes_referencia_str = today.strftime('%m/%Y')
-    data_vencimento = today + timedelta(days=10) # Vence em 10 dias, por exemplo (importar timedelta)
-
-    # Adicione a importação de timedelta no topo do arquivo views.py
-    # from datetime import datetime, date, timedelta 
-
+    data_vencimento = today + timedelta(days=10)
     if CobrancaMensalista.objects.filter(
         cliente_mensalista=cliente_mensalista_obj, 
         mes_referencia=mes_referencia_str,
@@ -500,8 +497,6 @@ def gerar_cobranca_imediata(request, cliente_id):
             status='pendente',
         )
         messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
-    
-    # Enviar E-mail AUTOMATICAMENTE após a Geração
     try:
         html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
         plain_message = strip_tags(html_message)
@@ -515,13 +510,11 @@ def gerar_cobranca_imediata(request, cliente_id):
     except Exception as e:
         messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
     
-    # Redirecionar para a tela de confirmação/recibo
     return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
 
 def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
     """
     View para emitir recibo de uma cobrança, seja diarista ou mensalista.
-    tipo_cobranca_str deve ser 'diarista' ou 'mensalista'.
     """
     if tipo_cobranca_str == 'diarista':
         cobranca = get_object_or_404(CobrancaDiarista, id=cobranca_id)
@@ -540,7 +533,6 @@ def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
 
     context = {
         'cobranca': cobranca, 'data_emissao': timezone.now(), 'tipo_cobranca': tipo_cobranca_str,
-        'nome_estacionamento': 'ParkControl Estacionamento', 'endereco_estacionamento': 'Rua Exemplo, 123 - Cidade - UF',
-        'cnpj_estacionamento': 'XX.XXX.XXX/YYYY-ZZ',
+        'nome_estacionamento': 'ParkControl Estacionamento',
     }
     return render(request, 'pagamentos/recibo.html', context)
