@@ -1,59 +1,91 @@
-# 🚗 ParkControl
+# ParkControl – Sistema de Gestão de Estacionamentos
 
-Sistema de Gestão de Estacionamento desenvolvido para facilitar o controle de entrada e saída de veículos, gerenciamento de vagas, gerenciamento de planos e relatórios financeiros.
+O **ParkControl** é um sistema web desenvolvido para a gestão completa de estacionamentos, oferecendo controle eficiente sobre entradas e saídas de veículos, gerenciamento de clientes, planos e relatórios financeiros. O projeto foi concebido como parte da disciplina de **Engenharia de Software (2025/01)** do IFMT.
 
-## 📌 Sobre o Projeto
+---
 
-O **ParkControl** é um sistema voltado para estacionamentos que desejam gerenciar suas operações de forma digital e eficiente. Ele foi desenvolvido como parte de um projeto acadêmico da disciplina de **Engenharia de Software – 2025/01**.
+## Visão Geral do Produto
 
-## 🎯 Funcionalidades
+O ParkControl foi projetado para digitalizar e automatizar processos operacionais de estacionamentos de pequeno e médio porte. Sua interface simples e recursos robustos garantem que diferentes perfis de usuários consigam operar o sistema com segurança, clareza e rapidez.
 
-- ✅ Registro de entrada e saída de veículos
-- ✅ Gerenciamento de vagas (livres, ocupadas e manutenção)
-- ✅ Cadastro e edição de clientes mensalistas e diaristas
-- ✅ Geração de relatórios financeiros
-- ✅ Geração de cobranças automáticas para mensalistas
-- ✅ Recuperação de senha de usuários
-- ✅ Gestão de usuários e permissões (Administrador, Frentista, Contador, TI)
-- ✅ Solicitação e acompanhamento de manutenção de vagas
+---
 
-## 👥 Perfis de Usuário
+## Funcionalidades Principais
 
-- **Administrador**: Gerencia usuários, planos, manutenção e supervisão geral do sistema.
-- **Frentista**: Controla entradas/saídas, visualiza vagas e solicita manutenção.
-- **Contador**: Gera relatórios, cobra mensalistas e acompanha pagamentos.
-  
-## 🛠️ Tecnologias Utilizadas
+- Registro de **entrada e saída** de veículos
+- Controle em tempo real das **vagas** (livres, ocupadas e manutenção)
+- Cadastro, visualização e edição de **clientes mensalistas e diaristas**
+- Geração e gestão de **cobranças** e **recibos**
+- Emissão de **relatórios financeiros** e de ocupação
+- **Gestão de usuários** e permissões por perfil
+- Solicitação e monitoramento de **manutenções de vaga**
+- Recuperação e redefinição de **senhas**
+- Navegação adaptada por **perfil de acesso**
 
-- Python 
-- Django
-- PostgreSQL
-- HTML + CSS (admin)
-- BPMN IO (modelagem de processos)
-- Figma (Protótipos de tela)
-- Lucidchart (Diagrama de casos de uso)
-- Mermaid Chart (Diagrama de Classe)
+---
 
-## 📄 Documentação
+## Perfis de Usuário
 
-A documentação completa do sistema está disponível na pasta [`DOC/`](./DOC), contendo:
+| Perfil        | Permissões Principais |
+|---------------|------------------------|
+| **Administrador** | Gerencia usuários, planos, solicitações de manutenção e tem acesso total ao sistema |
+| **Frentista**     | Realiza controle de entrada/saída de veículos, cadastra clientes e solicita manutenções |
+| **Contador**      | Visualiza relatórios, acompanha inadimplência e realiza cobranças |
+| **TI (Futuro)**   | Destinado à manutenção técnica e controle de segurança do sistema |
 
-- Casos de uso
-- Diagrama de classes
-- Diagramas BPMN dos processos
-- Protótipos de Tela
-- Visão geral do produto
+---
 
-## 🧑‍💻 Autores:
+## Tecnologias Utilizadas
 
-- [Emmylly Maria](https://github.com/emmyllydev)
-- [Fábio Júnior](https://github.com/Fabio-jr-SM)
-- [Filomena Soares](https://github.com/filomenasoares)
-- [Karla Viethia](https://github.com/belokarla7)
-- [Maria Clara](https://github.com/Giraldellis)
-- [Pedro Lucas](https://github.com/pedrolucasS86)
+- **Linguagem Backend**: Python 3.11
+- **Framework Web**: Django
+- **Banco de Dados**: SQLite (com possibilidade de migração para PostgreSQL)
+- **Frontend**: HTML5, CSS3, Bootstrap 5
+- **Versionamento**: Git + GitHub Projects (Kanban + Sprints)
+- **Modelagem e Prototipação**:
+  - Figma – Prototipação de Telas
+  - BPMN.IO – Modelagem de Processos
+  - Lucidchart – Diagrama de Casos de Uso
+  - Mermaid.js – Diagrama de Classes
 
+---
 
-## 📚 Licença
+## Estrutura da Documentação
 
-Este projeto é acadêmico e não possui licença comercial.
+A documentação completa do projeto está disponível na pasta [`/DOC`](./DOC), incluindo:
+
+- Documento de Visão de Produto
+- Cronograma de Desenvolvimento (Sprints)
+- Casos de Uso detalhados
+- Diagrama de Classes
+- Diagrama de Processo (BPMN)
+- Protótipos de Telas
+- Arquitetura de Software
+- Checklist das Etapas do Scrum
+
+---
+
+## Como Executar o Projeto
+
+> Instruções completas de instalação e execução do ambiente estão no arquivo [`README_DOCKER.md`](./README_DOCKER.md) e `docker-compose.yml`.
+
+---
+
+## Equipe de Desenvolvimento
+
+| Nome             | GitHub                                       |
+|------------------|----------------------------------------------|
+| Emmylly Maria    | [@emmyllydev](https://github.com/emmyllydev) |
+| Fábio Júnior     | [@Fabio-jr-SM](https://github.com/Fabio-jr-SM) |
+| Filomena Soares  | [@filomenasoares](https://github.com/filomenasoares) |
+| Karla Viethia    | [@belokarla7](https://github.com/belokarla7) |
+| Maria Clara      | [@Giraldellis](https://github.com/Giraldellis) |
+| Pedro Lucas      | [@pedrolucasS86](https://github.com/pedrolucasS86) |
+
+---
+
+## Licença
+
+Este é um projeto de caráter acadêmico, sem fins comerciais, licenciado apenas para uso educacional.
+
+---
