@@ -1,186 +1,83 @@
+# ParkControl – Sistema de Gestão de Estacionamentos
 
-# 🚗 ParkControl
-
-Sistema de gestão de estacionamento, desenvolvido em Django.
-
-Este projeto utiliza Docker para garantir que todos os desenvolvedores tenham o mesmo ambiente de desenvolvimento, sem precisar configurar manualmente Python, banco de dados ou dependências.
+O **ParkControl** é um sistema web desenvolvido para a gestão completa de estacionamentos, oferecendo controle eficiente sobre entradas e saídas de veículos, gerenciamento de clientes, planos e relatórios financeiros. O projeto foi concebido como parte da disciplina de **Engenharia de Software (2025/01)** do IFMT.
 
 ---
 
-## ⚙️ Pré-requisitos
+## Visão Geral do Produto
 
-- [Docker](https://www.docker.com/) instalado
-- [Git](https://git-scm.com/) instalado
-
----
-
-## 🚀 Como rodar o projeto
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/seu-usuario/parkcontrol.git
-cd parkcontrol
-````
-
-### 2. Suba o container Docker
-
-```bash
-docker-compose up --build
-```
-
-Isso irá:
-
-* Criar a imagem
-* Instalar as dependências do `requirements.txt`
-* Iniciar o servidor Django na porta `8000`
+O ParkControl foi projetado para digitalizar e automatizar processos operacionais de estacionamentos de pequeno e médio porte. Sua interface simples e recursos robustos garantem que diferentes perfis de usuários consigam operar o sistema com segurança, clareza e rapidez.
 
 ---
 
-## 🌐 Acesse o sistema
+## Funcionalidades Principais
 
-Após o build, acesse no navegador:
-
-```
-http://localhost:8000
-```
-
----
-
-## 🐳 Estrutura Docker
-
-* **Dockerfile**: define a imagem base (Python), dependências e execução.
-* **docker-compose.yml**: define o serviço `web`, porta, volume e variáveis de ambiente.
-* **.env**: arquivo com variáveis sensíveis e de configuração (como `SECRET_KEY`, etc.)
+- Registro de **entrada e saída** de veículos
+- Controle em tempo real das **vagas** (livres, ocupadas e manutenção)
+- Cadastro, visualização e edição de **clientes mensalistas e diaristas**
+- Geração e gestão de **cobranças** e **recibos**
+- Emissão de **relatórios financeiros** e de ocupação
+- **Gestão de usuários** e permissões por perfil
+- Solicitação e monitoramento de **manutenções de vaga**
+- Recuperação e redefinição de **senhas**
+- Navegação adaptada por **perfil de acesso**
 
 ---
 
-## 🧩 Estrutura de Pastas
+## Perfis de Usuário
 
-```text
-parkcontrol/
-│
-├── apps/                        # < Apps Django personalizados (bom para projetos grandes)
-│   ├── usuarios/                # App responsável pela autenticação e usuários
-│   │   ├── migrations/
-│   │   ├── models.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── forms.py
-│   │   ├── admin.py
-│   │   └── tests.py
-│   ├── frentistas/             # Funcionalidades do frentista (entrada/saída, cobrança, etc.)
-│   ├── clientes/               # Gerenciamento de mensalistas e diaristas
-│   ├── planos/                 # CRUD de planos
-│   ├── pagamentos/             # Cobranças e pagamentos
-│   ├── manutencao/             # Solicitações de manutenção
-│   ├── relatorios/             # Relatórios financeiros e de vagas
-│   ├── vagas/                  # Vagas
-│   └── core/                   # BaseModel, mixins, utilitários, etc.
-│
-├── manage.py                   # Script de gerenciamento do Django
-├── parkcontrol/                # Configurações do projeto Django
-│   ├── __init__.py
-│   ├── settings.py             # Configurações globais
-│   ├── urls.py                 # URLs globais
-│   ├── wsgi.py                 # Entrada para servidores WSGI
-│   └── asgi.py                 # Entrada para servidores ASGI
-│
-├── requirements.txt            # Dependências Python do projeto
-├── .env                        # Variáveis de ambiente (não subir para o Git)
-├── .dockerignore               # Arquivos a ignorar no Docker
-├── .gitignore
-├── Dockerfile                  # Instruções para criar a imagem do container
-├── docker-compose.yml          # Orquestração dos serviços com Docker
-├── README.md                   # Instruções e documentação do projeto
-└── docs/                       # Documentação do projeto (caso queira documentar BPMN, casos de uso, etc.)
-
-```
+| Perfil        | Permissões Principais |
+|---------------|------------------------|
+| **Administrador** | Gerencia usuários, planos, solicitações de manutenção e tem acesso total ao sistema |
+| **Frentista**     | Realiza controle de entrada/saída de veículos, cadastra clientes e solicita manutenções |
+| **Contador**      | Visualiza relatórios, acompanha inadimplência e realiza cobranças |
+| **TI (Futuro)**   | Destinado à manutenção técnica e controle de segurança do sistema |
 
 ---
 
-## 🛠️ Comandos úteis
+## Tecnologias Utilizadas
 
-### Executar comandos dentro do container
-
-```bash
-docker exec -it parkcontrol_web bash
-```
-
-### Rodar as migrações
-
-```bash
-docker exec -it parkcontrol_web python parkcontrol/manage.py migrate
-```
-
-### Criar superusuário
-
-```bash
-docker exec -it parkcontrol_web python parkcontrol/manage.py createsuperuser
-```
+- **Linguagem Backend**: Python 3.11
+- **Framework Web**: Django
+- **Banco de Dados**: SQLite (com possibilidade de migração para PostgreSQL)
+- **Frontend**: HTML5, CSS3, Bootstrap 5
+- **Versionamento**: Git + GitHub Projects (Kanban + Sprints)
+- **Modelagem e Prototipação**:
+  - Figma – Prototipação de Telas
+  - BPMN.IO – Modelagem de Processos
+  - Lucidchart – Diagrama de Casos de Uso
+  - Mermaid.js – Diagrama de Classes
 
 ---
 
-## 👨‍💻 Colaboração
+## Estrutura da Documentação
 
-Crie uma nova **branch** para cada feature, de acordo com o app:
+A documentação completa do projeto está disponível na pasta [`/DOC`](./DOC), incluindo:
 
-Exemplo:
-
-```bash
-git checkout -b feature/frentista-tela-inicial
-```
-
----
-
-## 📦 Variáveis de Ambiente
-
-No `.env` (já incluso no `.gitignore`):
-
-```env
-SECRET_KEY=your-secret-key
-DEBUG=True
-```
-
-## ✅ Passo a passo para subir as alterações no Docker
-
-### 1. Salve as alterações no seu projeto
-
-Certifique-se de que todos os arquivos modificados estão salvos.
+- Documento de Visão de Produto
+- Cronograma de Desenvolvimento (Sprints)
+- Casos de Uso detalhados
+- Diagrama de Classes
+- Diagrama de Processo (BPMN)
+- Protótipos de Telas
+- Arquitetura de Software
+- Checklist das Etapas do Scrum
 
 ---
 
-### 2. Se estiver com o Docker rodando, pare ele
+## Como Executar o Projeto
 
-```bash
-docker-compose down
-```
+> Instruções completas de instalação e execução do ambiente estão no arquivo [`README_DOCKER.md`](./README_DOCKER.md) e `docker-compose.yml`.
 
 ---
 
-### 3. Rebuild da imagem com as alterações
+## Equipe de Desenvolvimento
 
-Rode novamente:
+| Nome             | GitHub                                       |
+|------------------|----------------------------------------------|
+| Emmylly Maria    | [@emmyllydev](https://github.com/emmyllydev) |
+| Fábio Júnior     | [@Fabio-jr-SM](https://github.com/Fabio-jr-SM) |
+| Filomena Soares  | [@filomenasoares](https://github.com/filomenasoares) |
+| Pedro Lucas      | [@pedrolucasS86](https://github.com/pedrolucasS86) |
 
-```bash
-docker-compose up --build
-```
-
-> 🔁 O `--build` é necessário **sempre que você altera algo no código ou no Dockerfile**, pois ele força a reconstrução da imagem.
-
----
-
-### 4. (Opcional) Rodar migrações ou comandos dentro do container
-
-Se você fez alterações que envolvem o banco de dados ou migrations:
-
-```bash
-docker exec -it parkcontrol_web python parkcontrol/manage.py migrate
-```
-
-Ou, para outras tarefas como criar um superuser:
-
-```bash
-docker exec -it parkcontrol_web python parkcontrol/manage.py createsuperuser
-```
 
