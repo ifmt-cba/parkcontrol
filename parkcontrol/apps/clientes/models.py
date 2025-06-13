@@ -1,14 +1,8 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from apps.planos.models import Planos
 
 class Mensalista(models.Model):
-    PLANOS = [
-        ('Básico', 'Básico'),
-        ('Integral', 'Integral'),
-        ('Noturno', 'Noturno'),
-        ('Empresarial', 'Empresarial'),
-    ]
-
     nome = models.CharField(max_length=100)
     
     telefone = models.CharField(
@@ -22,8 +16,7 @@ class Mensalista(models.Model):
     )
 
     email = models.EmailField(max_length=100)
-    plano = models.CharField(max_length=100, choices=PLANOS)
-    
+    plano = models.ForeignKey(Planos, on_delete=models.PROTECT, related_name='mensalistas')
     placa = models.CharField(
         max_length=10,
         unique=True,

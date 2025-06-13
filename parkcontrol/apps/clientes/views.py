@@ -60,7 +60,7 @@ def editar_mensalista_view(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Cliente mensalista atualizado com sucesso!')
-            return redirect('cliente_mensalista') 
+            return redirect('clientes:editar_mensalista', pk=mensalista.pk) 
         else:
             messages.error(request, 'Erro ao atualizar cliente. Verifique os dados informados.')
     else:
@@ -88,7 +88,7 @@ def editar_diarista_view(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Cliente diarista atualizado com sucesso!')
-            return redirect('clientes:cliente_diarista') 
+            return redirect('clientes:editar_diarista', pk=diarista.pk) 
         else:
             messages.error(request, 'Erro ao atualizar cliente. Verifique os dados informados.')
     else:
