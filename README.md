@@ -1,5 +1,11 @@
 # ParkControl – Sistema de Gestão de Estacionamentos
 
+<div align="center">
+  <img src="parkcontrol/static/images/logo.png" alt="Logo ParkControl" width="200"/>
+</div>
+
+---
+
 O **ParkControl** é um sistema web desenvolvido para a gestão completa de estacionamentos, oferecendo controle eficiente sobre entradas e saídas de veículos, gerenciamento de clientes, planos e relatórios financeiros. O projeto foi concebido como parte da disciplina de **Engenharia de Software (2025/01)** do IFMT.
 
 ---
