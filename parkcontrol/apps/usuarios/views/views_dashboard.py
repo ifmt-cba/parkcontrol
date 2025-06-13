@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required # Import login_required decorator
 from django.contrib.auth.decorators import user_passes_test # Import user_passes_test decorator
-from django.shortcuts import render # Import render function to render templates
+from django.shortcuts import redirect, render # Import render function to render templates
 from .views_autenticacao import is_administrador, is_contador, is_frentista # Import user access control functions
 
 '''

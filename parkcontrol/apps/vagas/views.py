@@ -113,7 +113,7 @@ def solicitar_manutencao(request):
             solicitacao = form.save(commit=False)
             solicitacao.solicitante = request.user
             solicitacao.save()
-            return redirect('pagina_confirmacao')  # ou qualquer página que você deseje
+            return redirect('vagas/solicitar_manutencao.html')  
     else:
         form = SolicitacaoManutencaoForm()
     return render(request, 'vagas/solicitar_manutencao.html', {'form': form})
