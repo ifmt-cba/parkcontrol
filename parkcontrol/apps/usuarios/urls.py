@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import views_autenticacao, views_dashboard, views_gerencia_usuario, views_perfil
+
+from apps.clientes import views
+
+from .views import views_autenticacao, views_dashboard, views_gerencia_usuario, views_perfil, views_gerencia_cliente
 
 
 app_name = "usuarios"  # Define o namespace para o app usuarios
@@ -34,5 +37,12 @@ urlpatterns = [
     path('meu_perfil/', views_perfil.perfil_usuario, name='perfil_usuario'),
     path('editar_perfil/', views_perfil.editar_perfil_usuario, name='editar_perfil_usuario'),
     path('alterar_senha/', views_perfil.alterar_senha_usuario, name='alterar_senha_usuario'),
+    
+    #esqueceu senha
+    path('recuperar-senha/', views_autenticacao.recuperar_senha, name='recuperar_senha'),
 
+    # gerencia de clientes
+    path("gerencia_cliente/", views_gerencia_cliente.gerencia_cliente, name='gerencia_cliente'),
+    path('mensalistas/', views.cliente_mensalista_view, name='cliente_mensalista'),
+    path('diaristas/', views.cliente_diarista_view, name='cliente_diarista'),
 ]

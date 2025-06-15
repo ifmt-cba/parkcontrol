@@ -58,11 +58,24 @@
                         </td>
                         <td>
                             <a href="{% url 'clientes:editar_diarista' pk=cliente.pk %}" class="btn btn-outline-danger btn-sm">Editar</a>
+
+                            {% if user.is_superuser %}
+                                <a href="{% url 'clientes:excluir_diarista' pk=cliente.pk %}" class="btn btn-outline-dark btn-sm">Excluir</a>
+                                {% if cliente.ativo %}
+                                    <a href="{% url 'clientes:inativar_diarista' pk=cliente.pk %}" class="btn btn-outline-warning btn-sm">
+                                        Inativar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'clientes:ativar_diarista' pk=cliente.pk %}" class="btn btn-outline-success btn-sm">
+                                        Ativar
+                                    </a>
+                                {% endif %}
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6">Nenhum cliente encontrado.</td>
+                        <td colspan="5">Nenhum cliente encontrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -75,6 +88,14 @@
 </main>
 
 <footer class="text-center mt-4">
-    <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+    {% if user.is_superuser %}
+        <a href="{% url 'usuarios:gerencia_cliente' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">
+            Voltar
+        </a>
+    {% else %}
+        <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">
+            Voltar para Gerenciar Clientes
+        </a>
+    {% endif %}
 </footer>
 {% endblock %}

@@ -91,3 +91,8 @@ def dashboard_contador(request):
 @user_passes_test(is_frentista, login_url='login_parkcontrol')
 def dashboard_frentista(request):
     return render(request, 'usuarios/frentista/dashboard_frentista.html')
+
+
+#esqueci a senha
+def recuperar_senha(request):
+    return render(request, 'autenticacao/recuperar-senha.html')

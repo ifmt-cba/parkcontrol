@@ -16,7 +16,6 @@ class EntradaVeiculo(models.Model):
     nome = models.CharField(max_length=100)
     placa = models.CharField(
         max_length=10,
-        unique=True,
         validators=[
             RegexValidator(
                 r'^[A-Z]{3}[0-9][A-Z][0-9]{2}$',
