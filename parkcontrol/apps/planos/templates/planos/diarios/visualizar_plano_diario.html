@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Visualizar Plano Diário{% endblock %}
+
+{% block content %}
+<div class="container mt-5 p-4 border border-danger rounded shadow-sm">
+    <h1 class="mb-4" style="color: #E41515;">Plano Diário: {{ plano.nome }}</h1>
+
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Validade:</strong> {{ plano.validade }}</li>
+        <li class="list-group-item"><strong>Descrição:</strong> {{ plano.descricao }}</li>
+        <li class="list-group-item"><strong>Status:</strong> {{ plano.status }}</li>
+        <li class="list-group-item"><strong>Valor Diária:</strong> R$ {{ plano.valor_diaria }}</li>
+    </ul>
+
+    <a href="{% url 'planos:listar_planos_diarios' %}" class="btn btn-outline-danger mt-4">← Voltar</a>
+</div>
+{% endblock %}

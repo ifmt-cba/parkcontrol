@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Novo Plano Mensal{% endblock %}
+
+{% block content %}
+<div class="container mt-5 p-4 border rounded shadow-sm">
+    <h2 class="mb-4" style="color: #E41515;">Novo Plano Mensal</h2>
+    
+    <form method="post" class="needs-validation">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+            {% if form.nome.errors %}
+                <div class="text-danger">{{ form.nome.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.validade.label_tag }}
+            {{ form.validade }}
+            {% if form.validade.errors %}
+                <div class="text-danger">{{ form.validade.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.descricao.label_tag }}
+            {{ form.descricao }}
+            {% if form.descricao.errors %}
+                <div class="text-danger">{{ form.descricao.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            {{ form.status.label_tag }}
+            {{ form.status }}
+            {% if form.status.errors %}
+                <div class="text-danger">{{ form.status.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.valor.label_tag }}
+            {{ form.valor }}
+            {% if form.valor.errors %}
+                <div class="text-danger">{{ form.valor.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            {{ form.tipo_mensal.label_tag }}
+            {{ form.tipo_mensal }}
+            {% if form.tipo_mensal.errors %}
+                <div class="text-danger">{{ form.tipo_mensal.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-outline-danger">Salvar</button>
+        <a href="{% url 'planos:listar_planos_mensais' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Planos Diários{% endblock %}
+
+{% block content %}
+<h1 class="mb-4" style="color: #E41515;">Planos Diários</h1>
+
+<div class="d-flex justify-content-end mb-3">
+  <a href="{% url 'planos:criar_plano_diario' %}" class="btn btn-outline-danger">+ Novo Plano Diário</a>
+</div>
+
+<table class="table table-bordered border-danger table-striped align-middle">
+  <thead class="table-danger">
+    <tr>
+      <th>Nome</th>
+      <th>Validade</th>
+      <th>Descrição</th>
+      <th>Status</th>
+      <th>Valor Diária</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for plano in planos %}
+    <tr>
+      <td>{{ plano.nome }}</td>
+      <td>{{ plano.validade }}</td>
+      <td>{{ plano.descricao }}</td>
+      <td>{{ plano.status }}</td>
+      <td>R$ {{ plano.valor_diaria }}</td>
+      <td>
+        <a href="{% url 'planos:visualizar_plano_diario' plano.id %}" class="btn btn-sm btn-outline-danger me-1">Visualizar</a>
+        <a href="{% url 'planos:editar_plano_diario' plano.id %}" class="btn btn-sm btn-outline-danger me-1">Editar</a>
+        <a href="{% url 'planos:excluir_plano_diario' plano.id %}" class="btn btn-sm btn-danger">Excluir</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" class="text-center">Nenhum plano diário cadastrado.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Botão voltar para Seleção de Plano -->
+<div class="position-fixed bottom-0 start-0 m-3">
+  <a href="{% url 'planos:selecao_plano' %}" class="btn btn-outline-danger">← Voltar para Seleção de Plano</a>
+</div>
+
+{% endblock %}

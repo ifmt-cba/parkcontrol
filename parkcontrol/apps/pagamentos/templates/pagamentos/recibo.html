@@ -1,0 +1,59 @@
+{# apps/pagamentos/templates/pagamentos/recibo.html #}
+{% load static %}
+{% load form_tags %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Pagamento - ParkControl</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-white d-flex flex-column" style="min-height: 100vh;">
+
+    <header class="bg-danger py-3 px-4 text-center">
+        <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 50px;">
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+    </header>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <div class="container bg-white p-5 rounded-4 shadow-lg" style="max-width: 600px; border: 1px solid #ddd;">
+            <h2 class="text-center text-danger mb-4">RECIBO DE PAGAMENTO</h2>
+            
+            <div class="text-start mb-4">
+                <p><strong>Recebemos de:</strong>
+                    {% if tipo_cobranca == 'mensalista' %}
+                        {{ cobranca.cliente_mensalista.nome }}
+                        {% if cobranca.cliente_mensalista.email %} ({{ cobranca.cliente_mensalista.email }}){% endif %}
+                    {% else %} {# diarista #}
+                        Veículo {{ cobranca.movimento.placa_veiculo }}
+                    {% endif %}
+                </p>
+                <p><strong>A quantia de:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
+                <p><strong>Referente a:</strong> {{ cobranca.get_status_display }} da Cobrança #{{ cobranca.id }}</p>
+                {% if tipo_cobranca == 'mensalista' %}
+                <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
+                {% else %}
+                    <p><strong>Movimento:</strong> Entrada: {{ cobranca.movimento.hora_entrada|date:"d/m/Y H:i" }} / Saída: {{ cobranca.movimento.hora_saida|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+                <p><strong>Data de Emissão:</strong> {{ data_emissao|date:"d/m/Y H:i" }}</p>
+            </div>
+
+            <h3 class="text-center text-danger my-4">VALOR TOTAL PAGO: R$ {{ cobranca.valor_pago|floatformat:2 }}</h3>
+
+            <div class="text-center mt-5">
+                <p class="mt-4"><strong>{{ nome_estacionamento }}</strong></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-3 bg-light mt-auto">
+        <a href="{% url 'pagamentos:gerenciamento_pagamentos_home' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar ao Gerenciamento</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

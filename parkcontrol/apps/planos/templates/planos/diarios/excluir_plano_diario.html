@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Plano Diário{% endblock %}
+
+{% block content %}
+<h1 class="mb-4" style="color: #E41515;">Excluir Plano Diário</h1>
+
+<p>Tem certeza que deseja excluir o plano <strong>{{ plano.nome }}</strong>?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Sim, excluir</button>
+  <a href="{% url 'planos:listar_planos_diarios' %}" class="btn btn-outline-danger ms-2">Cancelar</a>
+</form>
+{% endblock %}

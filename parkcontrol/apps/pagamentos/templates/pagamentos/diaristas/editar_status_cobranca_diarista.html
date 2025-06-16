@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Editar Status Cobrança Diarista{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Editar Status da Cobrança Diarista</h1>
+    <p><strong>Placa do Veículo:</strong> {{ cobranca.movimento.placa_veiculo }}</p>
+    <p><strong>Status Atual:</strong> {{ cobranca.get_status_display }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{% url 'pagamentos:detalhe_cobranca_diarista' cobranca.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Página Inicial - Frentista{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4 mb-2 text-danger fw-bold">Frentista</h1>
+
+    <div class="d-flex flex-wrap gap-3 my-4">
+        <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-file-alt me-2"></i> Gerência Cobranças Diárias
+        </a>
+        <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-users-cog me-2"></i> Gerência de Vagas
+        </a>
+        <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger btn-lg flex-fill">
+            <i class="fas fa-users-cog me-2"></i> Gerência de Clientes
+        </a>
+    </div>
+</div>
+{% endblock %}

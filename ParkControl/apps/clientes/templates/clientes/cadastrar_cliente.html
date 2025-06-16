@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro de Clientes{% endblock %}
+
+{% block content %}
+<main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+    <h1 class="text-danger fw-bold mb-5">Cadastro de Clientes</h1>
+
+    <!-- Botões principais -->
+    <div class="container">
+        <div class="row justify-content-center g-4">
+            <div class="col-10 col-sm-6 col-md-4">
+                <a href="{% url 'clientes:cadastro_mensalista' %}" class="btn btn-outline-danger w-100 fw-bold py-4 rounded-4">
+                    CLIENTE<br>MENSALISTA
+                </a>
+            </div>
+            <div class="col-10 col-sm-6 col-md-4">
+                <a href="{% url 'clientes:cadastro_diarista' %}" class="btn btn-outline-danger w-100 fw-bold py-4 rounded-4">
+                    CLIENTE<br>DIARISTA
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Botão Voltar -->
+<footer class="pb-4 text-center">
+    <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+</footer>
+{% endblock %}
