@@ -13,7 +13,7 @@ import re
 
 # --- Importações de modelos dos apps ---
 from apps.usuarios.models import Usuario 
-from apps.clientes.models import Mensalista
+from apps.clientes.models import Diarista, Mensalista
 from apps.planos.models import Planos
 
 # --- Importações de e-mail ---
@@ -222,6 +222,52 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
 
     context = {'form': form, 'cliente': cliente_mensalista_obj} 
     return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
+
+def gerar_pagamentos_diaristas_lista_clientes(request):
+    """
+    Lista clientes Diaristas para que o contador possa gerenciar movimentos e cobranças para eles.
+    """
+    query_nome = request.GET.get('nome_cliente', '').strip()
+    query_placa = request.GET.get('placa_veiculo', '').strip()
+    status_filter = request.GET.get('status', 'ativo').strip()
+
+    # Consulta Diarista do app clientes
+    clientes_base_query = Diarista.objects.all().order_by('nome') 
+
+    clientes_filtrados = clientes_base_query
+    if status_filter == 'ativo':
+        clientes_filtrados = clientes_filtrados.filter(ativo=True)
+    elif status_filter == 'inativo':
+        clientes_filtrados = clientes_filtrados.filter(ativo=False)
+    
+    if query_nome:
+        clientes_filtrados = clientes_filtrados.filter(nome__icontains=query_nome) 
+
+    if query_placa:
+        clientes_filtrados = clientes_filtrados.filter(placa__icontains=query_placa)
+    diaristas_com_info = []
+    for diarista in clientes_filtrados:
+        
+        diarista_dict = {
+            'obj': diarista,
+        }
+        diaristas_com_info.append(diarista_dict)
+
+    paginator = Paginator(diaristas_com_info, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if not page_obj.object_list and (query_nome or query_placa or status_filter != 'todos'): 
+        messages.info(request, "Nenhum cliente diarista encontrado com os filtros informados.")
+
+    return render(request, 'pagamentos/diaristas/gerar_pagamentos_diaristas_lista_clientes.html', {
+        'titulo_pagina': 'Gerar Cobrança: Clientes Diaristas',
+        'page_obj': page_obj, 
+        'query_nome': query_nome,
+        'status_filter': status_filter,
+        'query_placa': query_placa,
+        'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
+    })
 
 def cobranca_gerada_confirmacao(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
@@ -463,7 +509,6 @@ def gerar_cobranca_imediata(request, cliente_id):
     """
     cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id)
 
-    # Lógica para calcular o valor da cobrança (similar ao initial_data do form)
     valor_devido_calculado = Decimal('0.00')
     if hasattr(cliente_mensalista_obj, 'plano') and cliente_mensalista_obj.plano:
         try:
@@ -510,7 +555,37 @@ def gerar_cobranca_imediata(request, cliente_id):
     except Exception as e:
         messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
     
-    return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
+    return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id)
+
+def gerar_movimento_diarista_imediata(request, diarista_id):
+    """
+    Cria um Movimento para um Diarista, calcula a cobrança e gera uma CobrancaDiarista.
+    Redireciona para o detalhe da Cobrança Diarista.
+    """
+    diarista_obj = get_object_or_404(Diarista, id=diarista_id)
+
+    with transaction.atomic():
+        novo_movimento = Movimento.objects.create(
+            placa_veiculo=diarista_obj.placa,
+        )
+        messages.success(request, f"Movimento de entrada registrado para {diarista_obj.placa}.")
+        
+        novo_movimento.hora_saida = timezone.now() + timedelta(minutes=10)
+        novo_movimento.save()
+
+        valor_a_cobrar = novo_movimento.calcular_total_estacionamento()
+        novo_movimento.valor_total_calculado = valor_a_cobrar
+        novo_movimento.save()
+
+        nova_cobranca_diarista = CobrancaDiarista.objects.create(
+            movimento=novo_movimento,
+            valor_devido=valor_a_cobrar,
+            status='pendente',
+            data_vencimento=timezone.now().date()
+        )
+        messages.success(request, f"Cobrança de diarista gerada para {diarista_obj.placa} no valor de R${valor_a_cobrar:.2f}.")
+
+    return redirect('pagamentos:detalhe_cobranca_diarista', cobranca_id=nova_cobranca_diarista.id)
 
 def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
     """
