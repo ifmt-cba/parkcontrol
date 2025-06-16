@@ -76,7 +76,6 @@ def formatar_tempo(tempo):
 def calcular_valor(placa, tempo):
     segundos = tempo.total_seconds()
 
-    # Verifica cliente
     mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
     diarista = Diarista.objects.filter(placa__iexact=placa).first()
 
@@ -96,7 +95,8 @@ def calcular_valor(placa, tempo):
             valor = horas * float(valor_plano)
             return 'Diarista', valor
     
-    return 'Não cadastrado', 0.0
+    # NÃO retorna 'Não cadastrado', só None
+    return None, None
 
 def buscar_saida_por_placa(request):
     placa = request.GET.get('placa')
@@ -147,20 +147,22 @@ def registrar_saida_view(request):
 
                     tipo_cliente, valor_total = calcular_valor(placa, tempo_permanencia)
 
-                    # Registrar a saída
-                    SaidaVeiculo.objects.create(
-                        entrada=entrada,
-                        tempo_permanencia=tempo_permanencia,
-                        horario_saida=horario_saida,
-                        valor_total=valor_total,
-                        tipo_cliente=tipo_cliente,
-                    )
+                    if tipo_cliente is None:
+                        messages.error(request, 'Cliente não cadastrado para realizar saída.')
+                    else:
+                        SaidaVeiculo.objects.create(
+                            entrada=entrada,
+                            tempo_permanencia=tempo_permanencia,
+                            horario_saida=horario_saida,
+                            valor_total=valor_total,
+                            tipo_cliente=tipo_cliente,
+                        )
 
-                    entrada.vaga.status = 'Livre'
-                    entrada.vaga.save()
+                        entrada.vaga.status = 'Livre'
+                        entrada.vaga.save()
 
-                    messages.success(request, 'Saída registrada e vaga liberada com sucesso!')
-                    return redirect('vagas:registrar_saida')
+                        messages.success(request, 'Saída registrada e vaga liberada com sucesso!')
+                        return redirect('vagas:registrar_saida')
     else:
         form = SaidaVeiculoForm()
 
