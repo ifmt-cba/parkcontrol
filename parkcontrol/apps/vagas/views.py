@@ -107,25 +107,36 @@ def buscar_saida_por_placa(request):
     if placa:
         entrada = EntradaVeiculo.objects.filter(placa__iexact=placa).order_by('-horario_entrada').first()
 
-        if entrada:
-            horario_saida = timezone.now()
-            tempo = horario_saida - entrada.horario_entrada
-
-            tipo_cliente, valor = calcular_valor(placa, tempo)
-
-            tempo_permanencia = formatar_tempo(tempo)
-            valor_total = f'{valor:.2f}'
-
+        if not entrada:
             return JsonResponse({
-                'tipo_cliente': tipo_cliente,
-                'tempo_permanencia': tempo_permanencia,
-                'valor_total': valor_total
+                'error': 'Nenhuma entrada encontrada para esta placa.'
             })
 
+        # Verificar se o cliente é cadastrado
+        mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
+        diarista = Diarista.objects.filter(placa__iexact=placa).first()
+
+        if not mensalista and not diarista:
+            return JsonResponse({
+                'error': 'Cliente não cadastrado. Não é possível calcular a saída.'
+            })
+
+        horario_saida = timezone.now()
+        tempo = horario_saida - entrada.horario_entrada
+
+        tipo_cliente, valor = calcular_valor(placa, tempo)
+
+        tempo_permanencia = formatar_tempo(tempo)
+        valor_total = f'{valor:.2f}'
+
+        return JsonResponse({
+            'tipo_cliente': tipo_cliente,
+            'tempo_permanencia': tempo_permanencia,
+            'valor_total': valor_total
+        })
+
     return JsonResponse({
-        'tipo_cliente': '',
-        'tempo_permanencia': '',
-        'valor_total': ''
+        'error': 'Placa não informada.'
     })
 
 def registrar_saida_view(request):
