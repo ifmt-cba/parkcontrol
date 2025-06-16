@@ -17,8 +17,13 @@ class Mensalista(models.Model):
     )
 
     email = models.EmailField(max_length=100)
+<<<<<<< Updated upstream
     plano = models.ForeignKey(Planos, on_delete=models.PROTECT, related_name='mensalistas')
     
+=======
+    plano = models.ForeignKey(Planos, on_delete=models.SET_NULL, null=True, limit_choices_to={'tipo': 'Mensalista'}, related_name="mensalistas")
+
+>>>>>>> Stashed changes
     placa = models.CharField(
         max_length=10,
         unique=True,
@@ -58,7 +63,7 @@ class Diarista(models.Model):
             )
         ]
     )
-
+    plano = models.ForeignKey(Planos, on_delete=models.SET_NULL, null=True, limit_choices_to={'tipo': 'Diarista'}, related_name="diaristas")
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
