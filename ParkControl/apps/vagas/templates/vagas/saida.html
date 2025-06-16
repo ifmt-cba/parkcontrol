@@ -21,11 +21,6 @@
         </div>
 
         <div class="mb-4 text-start">
-            <label class="form-label fw-semibold">Tipo de Veículo</label>
-            <input type="text" id="tipo_veiculo" name="tipo_veiculo" class="form-control bg-light" readonly>
-        </div>
-
-        <div class="mb-4 text-start">
             <label class="form-label fw-semibold">Tipo de Cliente</label>
             <input type="text" id="tipo_cliente" name="tipo_cliente" class="form-control bg-light" readonly>
         </div>
@@ -57,13 +52,11 @@ document.getElementById('id_placa').addEventListener('blur', function() {
                 document.getElementById('tempo_permanencia').value = data.tempo_permanencia || '';
                 document.getElementById('valor_total').value = data.valor_total ? 'R$ ' + data.valor_total : '';
                 document.getElementById('tipo_cliente').value = data.tipo_cliente || '';
-                document.getElementById('tipo_veiculo').value = data.tipo_veiculo || '';
             });
     } else {
         document.getElementById('tempo_permanencia').value = '';
         document.getElementById('valor_total').value = '';
         document.getElementById('tipo_cliente').value = '';
-        document.getElementById('tipo_veiculo').value = '';
     }
 });
 </script>

@@ -58,6 +58,16 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+
+                <label for="{{ form.plano.id_for_label }}" class="form-label mt-3">Selecionar Plano</label>
+                {{ form.plano|add_class:"form-select" }}
+                {% if form.plano.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.plano.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         </div>
 

@@ -10,7 +10,13 @@
 {% block content %}
 <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
     <h1 class="text-danger fw-bold mb-5">Clientes Mensalistas</h1>
-
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     <!-- Formulário de busca -->
     <div class="container mt-4">
         <form method="GET" class="row g-2 mb-4 justify-content-center">
@@ -40,6 +46,8 @@
                         <th>E-mail</th>
                         <th>Telefone</th>
                         <th>Placa</th>
+                        <th>Plano</th>
+                        <th>Valor do Plano</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -51,6 +59,8 @@
                         <td>{{ cliente.email }}</td>
                         <td>{{ cliente.telefone }}</td>
                         <td>{{ cliente.placa }}</td>
+                        <td>{{ cliente.plano.nome }}</td>
+                        <td>R$ {{ cliente.plano.valor|floatformat:2 }}</td>
                         <td>
                             {% if cliente.ativo %}
                                 <span class="badge bg-success">Ativo</span>

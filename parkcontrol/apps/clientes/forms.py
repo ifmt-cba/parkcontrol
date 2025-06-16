@@ -17,9 +17,10 @@ class MensalistaForm(forms.ModelForm):
 class DiaristaForm(forms.ModelForm):
     class Meta:
         model = Diarista
-        fields = ['nome', 'telefone', 'placa']
+        fields = ['nome', 'telefone', 'placa', 'plano']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
             'telefone': forms.TextInput(attrs={'class': 'form-control'}),
             'placa': forms.TextInput(attrs={'class': 'form-control'}),
+            'plano': forms.Select(attrs={'class': 'form-control'}),
         }

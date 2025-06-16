@@ -13,11 +13,6 @@ class Vaga(models.Model):
         return f'Vaga {self.numero} - {self.status}'
     
 class EntradaVeiculo(models.Model):
-    TIPO_VEICULO_CHOICES = [
-        ('Carro', 'Carro'),
-        ('Moto', 'Moto'),
-    ]
-
     nome = models.CharField(max_length=100)
     tipo_cliente = models.CharField(max_length=12) 
     placa = models.CharField(
@@ -30,7 +25,6 @@ class EntradaVeiculo(models.Model):
         ]
     )  
     
-    tipo_veiculo = models.CharField(max_length=10, choices=TIPO_VEICULO_CHOICES)
     horario_entrada = models.DateTimeField(default=timezone.now)
 
     vaga = models.ForeignKey(
@@ -61,7 +55,6 @@ class SaidaVeiculo(models.Model):
             )
         ]
     )  
-    tipo_veiculo = models.CharField(max_length=10)
     tipo_cliente = models.CharField(max_length=12)
     tempo_permanencia = models.DurationField(null=True, blank=True)
     horario_saida = models.DateTimeField(default=timezone.now)

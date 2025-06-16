@@ -39,6 +39,11 @@
                         {% if form.telefone.errors %}<div class="text-danger small mt-1">{{ form.telefone.errors }}</div>{% endif %}
                     </div>
                     <div class="col-md-6">
+                        <label for="{{ form.plano.id_for_label }}" class="form-label">Selecionar Plano</label>
+                        {{ form.plano|add_class:"form-select" }}
+                        {% if form.plano.errors %}<div class="text-danger small mt-1">{{ form.plano.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
                         <label for="{{ form.placa.id_for_label }}" class="form-label">Placa</label>
                         {{ form.placa|add_class:"form-control" }}
                         {% if form.placa.errors %}<div class="text-danger small mt-1">{{ form.placa.errors }}</div>{% endif %}

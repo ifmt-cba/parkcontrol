@@ -9,7 +9,7 @@ class EntradaVeiculoForm(forms.ModelForm):
     
     class Meta:
         model = EntradaVeiculo
-        fields = ['placa', 'nome', 'tipo_veiculo', 'vaga', 'tipo_cliente']
+        fields = ['placa', 'nome', 'vaga', 'tipo_cliente']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

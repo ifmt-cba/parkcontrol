@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from apps.clientes.models import Mensalista, Diarista
@@ -73,10 +73,34 @@ def formatar_tempo(tempo):
     minutos = (tempo.seconds % 3600) // 60
     return f'{horas}h {minutos}min'
 
+def calcular_valor(placa, tempo):
+    segundos = tempo.total_seconds()
+
+    # Verifica cliente
+    mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
+    diarista = Diarista.objects.filter(placa__iexact=placa).first()
+
+    if mensalista:
+        return 'Mensalista', 0.0
+
+    if diarista:
+        plano = diarista.plano
+        valor_plano = plano.valor if plano else 0.0
+
+        if segundos <= 600:
+            return 'Diarista', 0.0
+        else:
+            horas = int(segundos // 3600)
+            if segundos % 3600 > 0:
+                horas += 1
+            valor = horas * float(valor_plano)
+            return 'Diarista', valor
+    
+    return 'Não cadastrado', 0.0
+
 def buscar_saida_por_placa(request):
     placa = request.GET.get('placa')
     tipo_cliente = ''
-    tipo_veiculo = ''
     tempo_permanencia = ''
     valor_total = ''
 
@@ -86,42 +110,20 @@ def buscar_saida_por_placa(request):
         if entrada:
             horario_saida = timezone.now()
             tempo = horario_saida - entrada.horario_entrada
-            segundos = tempo.total_seconds()
 
-            tipo_veiculo = entrada.tipo_veiculo  # 🚗 Pega o tipo de veiculo da entrada
+            tipo_cliente, valor = calcular_valor(placa, tempo)
 
-            # Verificar se e mensalista ou diarista
-            mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
-            if mensalista:
-                tipo_cliente = 'Mensalista'
-                valor = 0.0
-            else:
-                tipo_cliente = 'Diarista'
-                if segundos <= 600:  #tolerancia
-                    valor = 0.0
-                else:
-                    horas = int(segundos // 3600)
-                    if segundos % 3600 > 0:
-                        horas += 1
-
-                    if tipo_veiculo.lower() == 'moto':
-                        valor = horas * 5.0
-                    else:  
-                        valor = horas * 10.0
-
-            tempo_permanencia = formatar_tempo(tempo)  
+            tempo_permanencia = formatar_tempo(tempo)
             valor_total = f'{valor:.2f}'
 
             return JsonResponse({
                 'tipo_cliente': tipo_cliente,
-                'tipo_veiculo': tipo_veiculo,
                 'tempo_permanencia': tempo_permanencia,
                 'valor_total': valor_total
             })
 
     return JsonResponse({
         'tipo_cliente': '',
-        'tipo_veiculo': '',
         'tempo_permanencia': '',
         'valor_total': ''
     })
@@ -131,7 +133,6 @@ def registrar_saida_view(request):
         form = SaidaVeiculoForm(request.POST)
         if form.is_valid():
             placa = form.cleaned_data['placa']
-
             entrada = EntradaVeiculo.objects.filter(placa__iexact=placa).order_by('-horario_entrada').first()
 
             if not entrada:
@@ -143,24 +144,8 @@ def registrar_saida_view(request):
                 else:
                     horario_saida = timezone.now()
                     tempo_permanencia = horario_saida - entrada.horario_entrada
-                    segundos = tempo_permanencia.total_seconds()
 
-                    mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
-
-                    if mensalista:
-                        valor_total = 0.0
-                    else:
-                        if segundos <= 600:
-                            valor_total = 0.0
-                        else:
-                            horas = int(segundos // 3600)
-                            if segundos % 3600 > 0:
-                                horas += 1
-
-                            if entrada.tipo_veiculo.lower() == 'moto':
-                                valor_total = horas * 5.0
-                            else:
-                                valor_total = horas * 10.0
+                    tipo_cliente, valor_total = calcular_valor(placa, tempo_permanencia)
 
                     # Registrar a saída
                     SaidaVeiculo.objects.create(
@@ -168,11 +153,9 @@ def registrar_saida_view(request):
                         tempo_permanencia=tempo_permanencia,
                         horario_saida=horario_saida,
                         valor_total=valor_total,
-                        tipo_cliente = entrada.tipo_cliente,
-                        tipo_veiculo = entrada.tipo_veiculo,
+                        tipo_cliente=tipo_cliente,
                     )
 
-                    # Liberar a vaga
                     entrada.vaga.status = 'Livre'
                     entrada.vaga.save()
 
