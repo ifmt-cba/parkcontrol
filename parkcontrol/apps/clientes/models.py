@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 
-from ParkControl.apps.planos.models import Planos
+from apps.planos.models import Planos
 
 class Mensalista(models.Model):
     nome = models.CharField(max_length=100)
@@ -17,13 +17,8 @@ class Mensalista(models.Model):
     )
 
     email = models.EmailField(max_length=100)
-<<<<<<< Updated upstream
-    plano = models.ForeignKey(Planos, on_delete=models.PROTECT, related_name='mensalistas')
-    
-=======
     plano = models.ForeignKey(Planos, on_delete=models.SET_NULL, null=True, limit_choices_to={'tipo': 'Mensalista'}, related_name="mensalistas")
 
->>>>>>> Stashed changes
     placa = models.CharField(
         max_length=10,
         unique=True,

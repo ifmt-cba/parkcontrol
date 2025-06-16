@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from decimal import Decimal
 
 # --- Importações de modelos dos apps ---
-from ParkControl.apps.planos.models import Planos
+from apps.planos.models import Planos
 from apps.clientes.models import Mensalista, Diarista
 from .models import CobrancaDiarista, CobrancaMensalista
 from .forms import GerarCobrancaMensalForm, CobrancaDiaristaStatusForm, CobrancaMensalistaStatusForm

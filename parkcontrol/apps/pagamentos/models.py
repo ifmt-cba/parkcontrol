@@ -4,6 +4,7 @@ from apps.usuarios.models import Usuario
 from decimal import Decimal
 import math
 from apps.vagas.models import SaidaVeiculo
+from apps.clientes.models import Mensalista
 
 
 class CobrancaDiarista(models.Model):
@@ -68,7 +69,7 @@ class CobrancaMensalista(models.Model):
         ('cancelado', 'Cancelado'),
     ]
 
-    cliente_mensalista = models.ForeignKey(ClienteMensalista, on_delete=models.CASCADE, verbose_name="Cliente Mensalista")
+    cliente_mensalista = models.ForeignKey(Mensalista, on_delete=models.CASCADE, verbose_name="Cliente Mensalista")
     
     data_geracao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Geração")
     data_vencimento = models.DateField(verbose_name="Data de Vencimento")
