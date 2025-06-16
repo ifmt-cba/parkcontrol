@@ -64,8 +64,8 @@ def login_parkcontrol(request):
         return render(request, 'autenticacao/login.html') 
 
 #Registration page
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def register_parkcontrol(request):
     # Check if the user is already authenticated
     if request.method == 'POST':
@@ -83,7 +83,7 @@ def register_parkcontrol(request):
         # Create a new user
         user = User.objects.create_user(username=username, email=email, password=password, first_name=first_name)
         user.save()
-        return redirect('register_parkcontrol') # Redirect to login page after registration
+        return redirect('usuarios:register_parkcontrol') # Redirect to login page after registration
     else: 
         # If the request method is GET, render the registration page
         return render(request, 'autenticacao/register.html')
@@ -101,19 +101,19 @@ def logout_parkcontrol(request):
 '''
 
 # Dashboard for Administrador
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_administrador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_administrador, login_url='usuarios:login_parkcontrol')
 def dashboard_administrador(request):
     return render(request, 'usuarios/administrador/dashboard_administrador.html')
 
 # Dashboard for Contador
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_contador, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_contador, login_url='usuarios:login_parkcontrol')
 def dashboard_contador(request):
     return render(request, 'usuarios/contador/dashboard_contador.html')
 
 # Dashboard for Frentista
-@login_required(login_url='login_parkcontrol')
-@user_passes_test(is_frentista, login_url='login_parkcontrol')
+@login_required(login_url='usuarios:login_parkcontrol')
+@user_passes_test(is_frentista, login_url='usuarios:login_parkcontrol')
 def dashboard_frentista(request):
     return render(request, 'usuarios/frentista/dashboard_frentista.html')
