@@ -120,19 +120,16 @@
                                 <td>{{ cliente.nome }}</td>
                                 <td>{{ cliente.plano|default:"N/A" }}</td> 
                                 <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
-                                <td> {# CÉLULA PARA O NOVO STATUS DO PAGAMENTO #}
+                                <td>
                                     {% if ultima_cobranca %}
                                         <span class="status-badge status-{{ ultima_cobranca.status }}">
                                             {{ ultima_cobranca.get_status_display }}
                                         </span>
-                                        <br>
-                                        <small>(Ref: {{ ultima_cobranca.mes_referencia }})</small>
                                     {% else %}
                                         Nenhuma cobrança
                                     {% endif %}
                                 </td>
                                 <td class="action-cell"> 
-                                    {# REMOVIDO: Botão Visualizar #}
                                     
                                     {# Botão Editar Status (que é tipo o gerenciar) #}
                                     {% if ultima_cobranca %}

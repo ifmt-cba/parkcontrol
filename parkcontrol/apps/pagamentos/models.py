@@ -6,7 +6,31 @@ import math
 
 # Importar modelos dos apps:
 from apps.usuarios.models import Usuario
-from apps.clientes.models import Mensalista
+from apps.clientes.models import Mensalista, Diarista
+from apps.planos.models import Planos
+
+class EntradaVeiculo(models.Model):
+    placa = models.CharField(max_length=8, unique=True, verbose_name="Placa do Veículo")
+    nome = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nome do Cliente")
+    horario_entrada = models.DateTimeField(auto_now_add=True, verbose_name="Horário de Entrada")
+
+    TIPO_CLIENTE_CHOICES = [
+        ('avulso', 'Avulso'),
+        ('mensalista', 'Mensalista'),
+        ('diarista', 'Diarista'),
+    ]
+    tipo_cliente = models.CharField(max_length=10, choices=TIPO_CLIENTE_CHOICES, default='avulso', verbose_name="Tipo de Cliente")
+
+    cliente_diarista = models.ForeignKey(Diarista, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Cliente Diarista Relacionado")
+    cliente_mensalista = models.ForeignKey(Mensalista, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Cliente Mensalista Relacionado")
+
+    class Meta:
+        verbose_name = "Entrada de Veículo"
+        verbose_name_plural = "Entradas de Veículos"
+        ordering = ['-horario_entrada']
+
+    def __str__(self):
+        return f"Entrada {self.placa} - {self.horario_entrada.strftime('%d/%m %H:%M')}"
 
 class Movimento(models.Model):
     placa_veiculo = models.CharField(max_length=8, verbose_name="Placa do Veículo")

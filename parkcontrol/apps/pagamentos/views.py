@@ -200,7 +200,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
                 messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
 
             try:
-                html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
+                html_message = render_to_string('pagamentos/email_cobranca_template.html', {'cobranca': nova_cobranca})
                 plain_message = strip_tags(html_message)
                 send_mail(
                     subject=f"ParkControl: Nova Cobrança Gerada #{nova_cobranca.id}",
@@ -273,7 +273,7 @@ def cobranca_gerada_confirmacao(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
 
     try:
-         html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': cobranca})
+         html_message = render_to_string('pagamentos/email_cobranca_template.html', {'cobranca': cobranca})
          plain_message = strip_tags(html_message)
          send_mail(
              subject=f"ParkControl: Nova Cobrança Gerada #{cobranca.id}",
@@ -485,7 +485,7 @@ def disparar_email_cobranca(request, cobranca_id):
         return redirect('pagamentos:listar_cobrancas_para_email')
 
     try:
-        html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': cobranca})
+        html_message = render_to_string('pagamentos/email_cobranca_template.html', {'cobranca': cobranca})
         plain_message = strip_tags(html_message)
 
         send_mail(
@@ -543,7 +543,7 @@ def gerar_cobranca_imediata(request, cliente_id):
         )
         messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
     try:
-        html_message = render_to_string('pagamentos/email/email_cobranca_template.html', {'cobranca': nova_cobranca})
+        html_message = render_to_string('pagamentos/email_cobranca_template.html', {'cobranca': nova_cobranca})
         plain_message = strip_tags(html_message)
         send_mail(
             subject=f"ParkControl: Nova Cobrança Gerada #{nova_cobranca.id}",
