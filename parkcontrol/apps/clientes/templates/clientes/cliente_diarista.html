@@ -21,7 +21,7 @@
                 <input type="text" name="placa" class="form-control" placeholder="Buscar por placa" value="{{ request.GET.placa }}">
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn bg-danger-subtle w-100">Filtrar</button>
+                <button type="submit" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Filtrar</button>
             </div>
         </form>
 
@@ -59,7 +59,7 @@
                         <td>
                             <a href="{% url 'clientes:editar_diarista' pk=cliente.pk %}" class="btn btn-outline-danger btn-sm">Editar</a>
 
-                            {% if user.is_superuser %}
+                            {% if user.is_authenticated and user.perfil_acesso == 'Administrador' %}
                                 <a href="{% url 'clientes:excluir_diarista' pk=cliente.pk %}" class="btn btn-outline-dark btn-sm">Excluir</a>
                                 {% if cliente.ativo %}
                                     <a href="{% url 'clientes:inativar_diarista' pk=cliente.pk %}" class="btn btn-outline-warning btn-sm">
@@ -88,13 +88,13 @@
 </main>
 
 <footer class="text-center mt-4">
-    {% if user.is_superuser %}
+    {% if user.is_authenticated and user.perfil_acesso == 'Administrador' %}
         <a href="{% url 'usuarios:gerencia_cliente' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">
             Voltar
         </a>
     {% else %}
         <a href="{% url 'frentistas:gerenciar_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">
-            Voltar para Gerenciar Clientes
+            Voltar
         </a>
     {% endif %}
 </footer>

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from apps.usuarios.views.views_autenticacao import is_administrador
 from .forms import MensalistaForm, DiaristaForm
 from .models import Mensalista, Diarista
 from django.contrib import messages
@@ -101,11 +102,9 @@ def editar_diarista_view(request, pk):
         form = DiaristaForm(instance=diarista) 
     return render(request, 'clientes/editar_diarista.html', {'form': form, 'diarista': diarista})
 
-def is_admin(user):
-    return user.is_superuser
 
 # Excluir Mensalista
-@user_passes_test(is_admin)
+@user_passes_test(is_administrador)
 def excluir_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
     if request.method == 'POST':
@@ -115,7 +114,7 @@ def excluir_mensalista_view(request, pk):
     return render(request, 'clientes/confirmar_exclusao.html', {'cliente': mensalista, 'tipo': 'Mensalista'})
 
 # Excluir Diarista
-@user_passes_test(is_admin)
+@user_passes_test(is_administrador)
 def excluir_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
     if request.method == 'POST':
@@ -124,7 +123,8 @@ def excluir_diarista_view(request, pk):
         return redirect('clientes:cliente_diarista')  # ajuste para sua URL de listagem
     return render(request, 'clientes/confirmar_exclusao.html', {'cliente': diarista, 'tipo': 'Diarista'})
 
-@user_passes_test(is_admin)
+#Inativar diarista
+@user_passes_test(is_administrador)
 def inativar_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
     diarista.ativo = False
@@ -132,7 +132,8 @@ def inativar_diarista_view(request, pk):
     messages.success(request, 'Cliente diarista inativado com sucesso!')
     return redirect('clientes:cliente_diarista')
 
-@user_passes_test(is_admin)
+#Ativar Diarita
+@user_passes_test(is_administrador)
 def ativar_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
     diarista.ativo = True
@@ -140,7 +141,8 @@ def ativar_diarista_view(request, pk):
     messages.success(request, 'Cliente diarista ativado com sucesso!')
     return redirect('clientes:cliente_diarista')
 
-@user_passes_test(is_admin)
+#Ativar mensalista
+@user_passes_test(is_administrador)
 def ativar_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
     mensalista.ativo = True
@@ -148,7 +150,8 @@ def ativar_mensalista_view(request, pk):
     messages.success(request, 'Cliente mensalista ativado com sucesso!')
     return redirect('clientes:cliente_mensalista')
 
-@user_passes_test(is_admin)
+#Inativar Mensalista
+@user_passes_test(is_administrador)
 def inativar_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
     mensalista.ativo = False

@@ -6,19 +6,22 @@ class EntradaVeiculoForm(forms.ModelForm):
         label='Vaga'
     )
     nome = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control w-100'}))
+    
     class Meta:
         model = EntradaVeiculo
-        fields = ['placa', 'nome', 'vaga']
+        fields = ['placa', 'nome', 'tipo_veiculo', 'vaga', 'tipo_cliente']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Filtra apenas vagas livres
         self.fields['vaga'].queryset = Vaga.objects.filter(status='Livre')
 
-class SaidaVeiculoForm(forms.ModelForm):
-    class Meta:
-        model = SaidaVeiculo
-        fields = ['placa']
+class SaidaVeiculoForm(forms.Form):
+    placa = forms.CharField(
+        max_length=10,
+        label='Placa',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
 
 class SolicitacaoManutencaoForm(forms.ModelForm):
     class Meta:

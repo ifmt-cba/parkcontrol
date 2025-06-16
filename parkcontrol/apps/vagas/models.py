@@ -13,7 +13,13 @@ class Vaga(models.Model):
         return f'Vaga {self.numero} - {self.status}'
     
 class EntradaVeiculo(models.Model):
+    TIPO_VEICULO_CHOICES = [
+        ('Carro', 'Carro'),
+        ('Moto', 'Moto'),
+    ]
+
     nome = models.CharField(max_length=100)
+    tipo_cliente = models.CharField(max_length=12) 
     placa = models.CharField(
         max_length=10,
         validators=[
@@ -22,8 +28,8 @@ class EntradaVeiculo(models.Model):
                 'Placa no formato inválido (ex: ABC1D23 - padrão Mercosul)'
             )
         ]
-    )
-
+    )  
+    tipo_veiculo = models.CharField(max_length=10, choices=TIPO_VEICULO_CHOICES)
     horario_entrada = models.DateTimeField(default=timezone.now)
 
     vaga = models.ForeignKey(
@@ -38,22 +44,13 @@ class EntradaVeiculo(models.Model):
         return f'Nome: {self.nome} - Placa: {self.placa} - Horario Entrada:{self.horario_entrada}'
 
 class SaidaVeiculo(models.Model):
+
     entrada = models.ForeignKey(
         'EntradaVeiculo',
         on_delete=models.CASCADE,
         related_name='saidas'
     )
-    placa = models.CharField(
-        max_length=10,
-        unique=True,
-        validators=[
-            RegexValidator(
-                r'^[A-Z]{3}[0-9][A-Z][0-9]{2}$',
-                'Placa no formato inválido (ex: ABC1D23 - padrão Mercosul)'
-            )
-        ]
-    )
-    
+
     tempo_permanencia = models.DurationField(null=True, blank=True)
     horario_saida = models.DateTimeField(default=timezone.now)
     valor_total = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, default=0) 

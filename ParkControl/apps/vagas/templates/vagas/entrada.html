@@ -15,11 +15,15 @@
     <form method="post" id="entrada-form">
         {% csrf_token %}
         <div class="row mb-3">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <label for="id_placa" class="form-label fw-bold">Placa:</label>
                 {{ form.placa }}
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
+                <label for="id_tipo_veiculo" class="form-label fw-bold">Tipo de Veículo:</label>
+                {{ form.tipo_veiculo }}
+            </div>
+            <div class="col-md-4 mb-3">
                 <label for="id_vaga" class="form-label fw-bold">Vaga:</label>
                 {{ form.vaga }}
             </div>
@@ -27,6 +31,10 @@
         <div class="mb-4 text-start">
             <label for="id_nome" class="form-label fw-bold">Nome:</label>
             {{ form.nome }}
+        </div>
+        <div class="mb-4 text-start">
+            <label for="id_tipo_cliente" class="form-label fw-bold">Tipo de Cliente:</label>
+            {{ form.tipo_cliente }}
         </div>
         <div class="d-flex justify-content-between mt-5">
             <a href="{% url 'frentistas:gerenciar_vagas' %}" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Voltar</a>
@@ -36,20 +44,28 @@
 </div>
 
 <script>
-// Autopreenchimento do nome ao digitar a placa
+// Seleciona os campos
 const placaInput = document.getElementById('id_placa');
 const nomeInput = document.getElementById('id_nome');
-if (placaInput && nomeInput) {
+const tipoClienteInput = document.getElementById('id_tipo_cliente');
+
+// Verifica se os elementos existem antes de adicionar o evento
+if (placaInput && nomeInput && tipoClienteInput) {
     placaInput.addEventListener('blur', function() {
-        var placa = this.value;
+        const placa = this.value.trim();
         if (placa.length >= 7) {
-            fetch('/vagas/buscar-nome/?placa=' + encodeURIComponent(placa))
+            fetch(`/vagas/buscar-nome/?placa=${encodeURIComponent(placa)}`)
                 .then(response => response.json())
                 .then(data => {
                     nomeInput.value = data.nome || '';
+                    tipoClienteInput.value = data.tipo_cliente || '';
+                })
+                .catch(error => {
+                    console.error('Erro na busca:', error);
                 });
         } else {
             nomeInput.value = '';
+            tipoClienteInput.value = '';
         }
     });
 }

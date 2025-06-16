@@ -8,7 +8,6 @@
         .recibo { border: 2px solid black; padding: 20px; width: 500px; margin: auto; }
         h1 { text-align: center; }
         .linha { margin-bottom: 10px; }
-        .botao { text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -16,7 +15,7 @@
         <h1>Recibo de Saída</h1>
 
         <div class="linha"><strong>Nome:</strong> {{ entrada.nome }}</div>
-        <div class="linha"><strong>Placa:</strong> {{ placa }}</div>
+        <div class="linha"><strong>Placa:</strong> {{ entrada.placa }}</div>
         <div class="linha"><strong>Tipo de Cliente:</strong> {{ tipo_cliente }}</div>
         <div class="linha"><strong>Horário de Entrada:</strong> {{ entrada.horario_entrada }}</div>
         <div class="linha"><strong>Horário de Saída:</strong> {{ saida.horario_saida }}</div>
@@ -27,10 +26,6 @@
         {% else %}
             <div class="linha"><strong>Plano Mensalista:</strong> Valor já incluso no plano</div>
         {% endif %}
-
-        <div class="botao">
-            <button onclick="window.print()">Imprimir Recibo</button>
-        </div>
     </div>
 </body>
 </html>

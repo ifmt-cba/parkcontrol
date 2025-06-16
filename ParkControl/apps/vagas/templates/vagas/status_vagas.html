@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Status das Vagas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-danger fw-bold mb-4 text-center">Status das Vagas</h1>
+
+    <button class="btn btn-outline-danger fw-bold mb-4" onclick="atualizarVagas()">Atualizar</button>
+
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nº Vaga</th>
+                <th>Status</th>
+                <th>Detalhes</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-vagas">
+            {% for vaga in vagas %}
+                <tr>
+                    <td>{{ vaga.numero }}</td>
+                    <td>
+                        {% if vaga.status == 'Livre' %}
+                            <span class="badge bg-success rounded-pill px-3 py-2">Livre</span>
+                        {% elif vaga.status == 'Ocupada' %}
+                            <span class="badge bg-danger rounded-pill px-3 py-2">Ocupada</span>
+                        {% elif vaga.status == 'Manutenção' %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Manutenção</span>
+                        {% else %}
+                            {{ vaga.status }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span id="detalhe-{{ vaga.id }}">-</span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between mt-5">
+        <a href="{% url 'frentistas:gerenciar_vagas' %}" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Voltar</a>
+    </div>
+</div>
+
+<script>
+function atualizarVagas() {
+    fetch("{% url 'vagas:api_status_vagas' %}")
+        .then(response => response.json())
+        .then(data => {
+            const vagas = data.vagas;
+            vagas.forEach(vaga => {
+                const detalhe = document.getElementById('detalhe-' + vaga.id);
+                if (vaga.status === 'Ocupada' && vaga.placa) {
+                    detalhe.innerText = 'Placa: ' + vaga.placa;
+                } else if (vaga.status === 'Manutenção' && vaga.descricao) {
+                    detalhe.innerText = 'Problema: ' + vaga.descricao;
+                } else {
+                    detalhe.innerText = '-';
+                }
+
+                const statusCell = detalhe.parentElement.previousElementSibling;
+                statusCell.innerHTML = '';
+                if (vaga.status === 'Livre') {
+                    statusCell.innerHTML = '<span class="badge bg-success rounded-pill px-3 py-2">Livre</span>';
+                } else if (vaga.status === 'Ocupada') {
+                    statusCell.innerHTML = '<span class="badge bg-danger rounded-pill px-3 py-2">Ocupada</span>';
+                } else if (vaga.status === 'Manutenção') {
+                    statusCell.innerHTML = '<span class="badge bg-warning text-dark rounded-pill px-3 py-2">Manutenção</span>';
+                } else {
+                    statusCell.innerText = vaga.status;
+                }
+            });
+        });
+}
+
+// Atualiza automaticamente a cada 10 segundos
+setInterval(atualizarVagas, 10000);
+</script>
+{% endblock %}
