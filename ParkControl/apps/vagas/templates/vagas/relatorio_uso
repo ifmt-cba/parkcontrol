@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório de Uso de Vagas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-danger fw-bold mb-4 text-center">Relatório de Uso de Vagas</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Vagas</div>
+                <div class="card-body">
+                    <p><strong>Total:</strong> {{ total_vagas }}</p>
+                    <p><strong>Ocupadas:</strong> {{ vagas_ocupadas }}</p>
+                    <p><strong>Livres:</strong> {{ vagas_livres }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Movimentação Total</div>
+                <div class="card-body">
+                    <p><strong>Entradas:</strong> {{ total_entradas }}</p>
+                    <p><strong>Saídas:</strong> {{ total_saidas }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Últimos 7 Dias</div>
+                <div class="card-body">
+                    <p><strong>Entradas:</strong> {{ entradas_7dias }}</p>
+                    <p><strong>Saídas:</strong> {{ saidas_7dias }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <footer class="d-flex justify-content-between mt-5">
+        <a href="{% url 'frentistas:gerenciar_vagas' %}" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Voltar</a>
+      </footer>
+      
+</div>
+{% endblock %}
