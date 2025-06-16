@@ -24,6 +24,15 @@ def registrar_entrada_view(request):
             
             entrada.nome = cliente.nome  # 🆗 Atribui o nome automaticamente
 
+             # 🚫 Verifica se já existe uma entrada ativa para essa placa
+            entrada_existente = EntradaVeiculo.objects.filter(placa__iexact=entrada.placa).exclude(
+            id__in=SaidaVeiculo.objects.values_list('entrada_id', flat=True)
+            ).exists()
+
+            if entrada_existente:
+                messages.error(request, 'Entrada já registrada para essa placa.')
+                return render(request, 'vagas/entrada.html', {'form': form})
+
             # 🔐 Verifica se a vaga está livre
             vaga = entrada.vaga
             if vaga.status != 'Livre':
@@ -158,7 +167,9 @@ def registrar_saida_view(request):
                         entrada=entrada,
                         tempo_permanencia=tempo_permanencia,
                         horario_saida=horario_saida,
-                        valor_total=valor_total
+                        valor_total=valor_total,
+                        tipo_cliente = entrada.tipo_cliente,
+                        tipo_veiculo = entrada.tipo_veiculo,
                     )
 
                     # Liberar a vaga
