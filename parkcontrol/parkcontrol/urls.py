@@ -8,7 +8,6 @@ urlpatterns = [
     path('frentistas/', include('apps.frentistas.urls', namespace='frentistas')),
     path('clientes/', include('apps.clientes.urls', namespace='clientes')),
     path('vagas/', include('apps.vagas.urls', namespace='vagas')),
-    path('accounts/', include('django.contrib.auth.urls')),  # <-- ISSO AQUI É ESSENCIAL
-
+    path('accounts/', include('django.contrib.auth.urls')),
     path('manutencao/', include('apps.manutencao.urls', namespace='manutencao')),
 ]
