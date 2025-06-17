@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recibo{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="card shadow-lg rounded-4">
+        <!-- Cabeçalho -->
+        <div class="card-header bg-danger text-white rounded-top-4">
+            <h2 class="mb-0 fw-bold text-center">Recibo de Pagamento</h2>
+        </div>
+
+        <!-- Corpo do Recibo -->
+        <div class="card-body px-5 py-4">
+            <!-- Dados do Cliente e Veículo -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Cliente:</strong> {{ cobranca.nome}}</p>
+                    <p class="mb-1"><strong>Placa do Veículo:</strong> {{ cobranca.placa }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><strong>Status:</strong>
+                        <span class="badge {% if cobranca.status == 'Pago' %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ cobranca.status }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Dados da Entrada e Saída -->
+            <p><strong>Entrada:</strong> {{ saida.entrada.horario_entrada|date:"d/m/Y H:i:s" }}</p>
+            <p><strong>Saída:</strong> {{ saida.horario_saida|date:"d/m/Y H:i:s" }}</p>
+
+            <hr>
+
+            <!-- Dados da Cobrança -->
+            <div class="mb-4">
+                <h5 class="fw-bold">Detalhes da Cobrança</h5>
+                <p class="mb-1"><strong>Tempo de Permanência:</strong> {{ tempo_permanencia_formatado }}</p>
+                <p class="mb-1"><strong>Valor:</strong>
+                    <span class="fw-bold fs-5 text-success">R$ {{ cobranca.valor_total }}</span>
+                </p>
+            </div>
+
+            <hr>
+
+            <!-- Observações -->
+            <div class="text-center">
+                <p class="fw-semibold fst-italic">
+                    Este recibo comprova o pagamento do serviço de estacionamento,
+                    referente ao período informado.
+                </p>
+            </div>
+        </div>
+
+        <!-- Rodapé com Botões -->
+        <div class="card-footer bg-white d-flex justify-content-center gap-3">
+            <a href="{% url 'frentistas:gerenciar_cobranca_diaria' %}" class="btn btn-danger px-4">
+                Voltar
+            </a>
+            <button class="btn btn-secondary px-4" onclick="window.print()">
+                Imprimir Recibo
+            </button>
+        </div>
+    </div>
+</main>
+{% endblock %}

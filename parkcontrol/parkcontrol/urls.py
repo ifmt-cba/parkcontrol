@@ -9,5 +9,6 @@ urlpatterns = [
     path('clientes/', include('apps.clientes.urls', namespace='clientes')),
     path('vagas/', include('apps.vagas.urls', namespace='vagas')),
     path('accounts/', include('django.contrib.auth.urls')),  # <-- ISSO AQUI É ESSENCIAL
+    path('pagamentos/', include('apps.pagamentos.urls', namespace='pagamentos')),
 
 ]
