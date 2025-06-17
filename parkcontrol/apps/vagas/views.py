@@ -214,9 +214,17 @@ def solicitar_manutencao(request):
             solicitacao = form.save(commit=False)
             solicitacao.solicitante = request.user
             solicitacao.save()
-            return redirect('vagas:solicitar_manutencao.html')  
+
+            # Atualizar o status da vaga para "Manutenção"
+            vaga = solicitacao.numero_vaga  # Já é um objeto Vaga
+            vaga.status = 'Manutenção'
+            vaga.save()
+
+            messages.success(request, "Solicitação de manutenção enviada com sucesso!")
+            return redirect('vagas:solicitar_manutencao')
     else:
         form = SolicitacaoManutencaoForm()
+
     return render(request, 'vagas/solicitar_manutencao.html', {'form': form})
 
 def relatorio_uso_vagas(request):

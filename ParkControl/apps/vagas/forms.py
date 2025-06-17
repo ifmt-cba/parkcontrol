@@ -24,11 +24,19 @@ class SaidaVeiculoForm(forms.Form):
     )
 
 class SolicitacaoManutencaoForm(forms.ModelForm):
+    numero_vaga = forms.ModelChoiceField(
+        queryset=Vaga.objects.exclude(status='Ocupada'),
+        label='Nº da Vaga',
+        empty_label="Selecione uma vaga disponível"
+    )
+
     class Meta:
         model = SolicitacaoManutencao
         fields = ['numero_vaga', 'descricao']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Refiltra novamente por segurança
+        self.fields['numero_vaga'].queryset = Vaga.objects.exclude(status='Ocupada')
         self.fields['numero_vaga'].widget.attrs.update({'class': 'form-control'})
         self.fields['descricao'].widget.attrs.update({'class': 'form-control'})
