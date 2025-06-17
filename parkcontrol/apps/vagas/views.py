@@ -2,6 +2,7 @@ from datetime import timedelta
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from apps.pagamentos.models import CobrancaDiaria
 from apps.clientes.models import Mensalista, Diarista
 from .models import EntradaVeiculo, SaidaVeiculo, SolicitacaoManutencao, Vaga
 from django.utils import timezone
@@ -25,9 +26,14 @@ def registrar_entrada_view(request):
             entrada.nome = cliente.nome  # 🆗 Atribui o nome automaticamente
 
              # 🚫 Verifica se já existe uma entrada ativa para essa placa
-            entrada_existente = EntradaVeiculo.objects.filter(placa__iexact=entrada.placa).exclude(
-            id__in=SaidaVeiculo.objects.values_list('entrada_id', flat=True)
+            entrada_existente = EntradaVeiculo.objects.filter(
+                placa__iexact=entrada.placa,
+                saidas__isnull=True  # Ajuste para o nome do related_name correto
             ).exists()
+
+            if entrada_existente:
+                messages.error(request, 'Entrada já registrada para essa placa e ainda sem saída.')
+                return render(request, 'vagas/entrada.html', {'form': form})
 
             if entrada_existente:
                 messages.error(request, 'Entrada já registrada para essa placa.')
@@ -144,36 +150,56 @@ def registrar_saida_view(request):
         form = SaidaVeiculoForm(request.POST)
         if form.is_valid():
             placa = form.cleaned_data['placa']
-            entrada = EntradaVeiculo.objects.filter(placa__iexact=placa).order_by('-horario_entrada').first()
+            entrada = EntradaVeiculo.objects.filter(
+                placa__iexact=placa
+            ).order_by('-horario_entrada').first()
 
             if not entrada:
-                messages.error(request, 'Nenhuma entrada encontrada para esta placa.')
-            else:
-                saida_existente = SaidaVeiculo.objects.filter(entrada=entrada).first()
-                if saida_existente:
-                    messages.error(request, 'Esta entrada já possui uma saída registrada.')
-                else:
-                    horario_saida = timezone.now()
-                    tempo_permanencia = horario_saida - entrada.horario_entrada
+                messages.error(request, '❌ Nenhuma entrada encontrada para esta placa.')
+                return redirect('vagas:registrar_saida')
 
-                    tipo_cliente, valor_total = calcular_valor(placa, tempo_permanencia)
+            saida_existente = SaidaVeiculo.objects.filter(entrada=entrada).first()
+            if saida_existente:
+                messages.error(request, '⚠️ Esta entrada já possui uma saída registrada.')
+                return redirect('vagas:registrar_saida')
 
-                    if tipo_cliente is None:
-                        messages.error(request, 'Cliente não cadastrado para realizar saída.')
-                    else:
-                        SaidaVeiculo.objects.create(
-                            entrada=entrada,
-                            tempo_permanencia=tempo_permanencia,
-                            horario_saida=horario_saida,
-                            valor_total=valor_total,
-                            tipo_cliente=tipo_cliente,
-                        )
+            horario_saida = timezone.now()
+            tempo_permanencia = horario_saida - entrada.horario_entrada
 
-                        entrada.vaga.status = 'Livre'
-                        entrada.vaga.save()
+            tipo_cliente, valor_total = calcular_valor(placa, tempo_permanencia)
 
-                        messages.success(request, 'Saída registrada e vaga liberada com sucesso!')
-                        return redirect('vagas:registrar_saida')
+            if tipo_cliente == 'Não cadastrado':
+                messages.error(request, '❌ Veículo não cadastrado. Cadastre o cliente antes de registrar a saída.')
+                return redirect('vagas:registrar_saida')
+
+            # Registrar saída
+            saida = SaidaVeiculo.objects.create(
+                entrada=entrada,
+                tempo_permanencia=tempo_permanencia,
+                horario_saida=horario_saida,
+                valor_total=valor_total,
+                tipo_cliente=tipo_cliente,
+            )
+
+            # Se for diarista, cria cobrança
+            if tipo_cliente == 'Diarista':
+                CobrancaDiaria.objects.create(
+                    placa=entrada.placa,
+                    nome=entrada.nome,
+                    data=timezone.now().date(),
+                    valor_total=valor_total,
+                    status='Pendente',
+                    horario_entrada=entrada.horario_entrada,
+                    horario_saida=horario_saida
+                )
+
+            # Liberar vaga
+            entrada.vaga.status = 'Livre'
+            entrada.vaga.save()
+
+            messages.success(request, '✅ Saída registrada e vaga liberada com sucesso!')
+            return redirect('pagamentos:listar_cobranca')
+
     else:
         form = SaidaVeiculoForm()
 
