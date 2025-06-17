@@ -62,8 +62,9 @@ def listar_vagas(request):
     vagas = Vaga.objects.all()
     return render(request, 'vagas/listar_vagas.html', {'vagas': vagas})
 
+# apps/vagas/models.py
 class SolicitacaoManutencao(models.Model):
-    numero_vaga = models.CharField(max_length=10)
+    numero_vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE)
     descricao = models.TextField()
     data_solicitacao = models.DateTimeField(auto_now_add=True)
     solicitante = models.ForeignKey(
@@ -75,4 +76,4 @@ class SolicitacaoManutencao(models.Model):
     resolvido = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Manutenção vaga {self.numero_vaga} - {'Resolvido' if self.resolvido else 'Pendente'}"
+        return f"Manutenção vaga {self.numero_vaga.numero} - {'Resolvido' if self.resolvido else 'Pendente'}"

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manutenção de Vagas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-danger fw-bold mb-4">Painel de Manutenção</h2>
+
+    <!-- Abas de navegação -->
+    <ul class="nav nav-tabs mb-4" id="tabManutencao" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="solicitacoes-tab" data-bs-toggle="tab" data-bs-target="#solicitacoes" type="button" role="tab">Solicitações Abertas</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">Status das Vagas</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="tabContentManutencao">
+        <!-- Aba 1: Solicitações -->
+        <div class="tab-pane fade show active" id="solicitacoes" role="tabpanel">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if solicitacoes %}
+            <form method="GET" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <input type="text" name="protocolo" class="form-control" placeholder="Protocolo">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="vaga" class="form-control" placeholder="Número da Vaga">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="data" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-danger w-100">Filtrar</button>
+                </div>
+            </form>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Vaga</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th>Solicitante</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitacoes %}
+                    <tr>
+                        <td>{{ s.numero_vaga }}</td>
+                        <td>{{ s.descricao }}</td>
+                        <td>{{ s.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                        <td>{{ s.solicitante.first_name }}</td>
+                        <td><span class="badge bg-warning text-dark">Aberta</span></td>
+                        <td>
+                            <a href="{% url 'manutencao:encerrar_solicitacao' s.id %}" class="btn btn-sm btn-success"
+                                onclick="return confirm('Deseja encerrar esta solicitação?')">Encerrar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-info">Nenhuma solicitação aberta encontrada.</div>
+            {% endif %}
+        </div>
+
+        <!-- Aba 2: Status das Vagas -->
+        <div class="tab-pane fade" id="status" role="tabpanel">
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nº Vaga</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vaga in vagas %}
+                    <tr>
+                        <td>{{ vaga.numero }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'manutencao:alterar_status_vaga' vaga.id %}" class="d-flex justify-content-center align-items-center">
+                                {% csrf_token %}
+                                <select name="status" class="form-select form-select-sm w-auto me-2">
+                                    <option value="Livre" {% if vaga.status == 'Livre' %}selected{% endif %}>Livre</option>
+                                    <option value="Ocupada" {% if vaga.status == 'Ocupada' %}selected{% endif %}>Ocupada</option>
+                                    <option value="Manutenção" {% if vaga.status == 'Manutenção' %}selected{% endif %}>Manutenção</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Atualizar</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if vaga.status == 'Livre' %}
+                            <span class="badge bg-success">Livre</span>
+                            {% elif vaga.status == 'Ocupada' %}
+                            <span class="badge bg-danger">Ocupada</span>
+                            {% elif vaga.status == 'Manutenção' %}
+                            <span class="badge bg-warning text-dark">Manutenção</span>
+                            {% else %}
+                            {{ vaga.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

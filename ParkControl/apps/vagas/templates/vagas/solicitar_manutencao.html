@@ -4,6 +4,12 @@
 {% block content %}
 <div class="container py-5">
     <h1 class="text-danger fw-bold mb-4 text-center">Solicitar Manutenção</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
