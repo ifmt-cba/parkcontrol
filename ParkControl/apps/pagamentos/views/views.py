@@ -123,17 +123,14 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
     initial_data = {
         'mes': today.month,
         'ano': today.year,
-        # Passa o valor calculado para ser usado no template para exibição
         'valor_devido': valor_devido_calculado 
     }
 
     if request.method == 'POST':
-        # form agora não recebe valor_devido, mas initial_data ainda pode ser passado para manter o mes/ano
         form = GerarCobrancaMensalForm(request.POST, initial=initial_data, request=request) 
         if form.is_valid():
             mes_referencia_str = form.cleaned_data['mes_referencia_str'] 
             data_vencimento = form.cleaned_data['data_vencimento']
-            # O valor_devido é o valor_devido_calculado, não vem mais do form.cleaned_data
             valor_final_da_cobranca = valor_devido_calculado
 
             if CobrancaMensalista.objects.filter(
@@ -148,7 +145,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
                     cliente_mensalista=cliente_mensalista_obj, 
                     mes_referencia=mes_referencia_str,
                     data_vencimento=data_vencimento,
-                    valor_devido=valor_final_da_cobranca, # Usa o valor calculado
+                    valor_devido=valor_final_da_cobranca,
                     status='pendente',
                 )
                 messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
@@ -168,14 +165,11 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
 
             return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
 
-        else: # Formulário inválido (POST)
-            # Re-renderiza o form com erros. initial_data já tem valor_devido, mes, ano
+        else:
             context = {'form': form, 'cliente': cliente_mensalista_obj}
-            # A mensagem de warning se valor for 0 já foi adicionada acima.
             return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context) 
 
-    else: # Requisição GET (primeira vez que acessa a página)
-        # initial_data já está preenchida com mes/ano e valor_devido
+    else: 
         form = GerarCobrancaMensalForm(initial=initial_data, request=request)
         
         context = {'form': form, 'cliente': cliente_mensalista_obj}
@@ -269,9 +263,8 @@ def listar_cobrancas_mensalistas(request):
     query_mes = request.GET.get('mes_referencia', '').strip() 
     status_filter = request.GET.get('status', '').strip()
 
-    # Otimização: Garantir que todos os dados relacionados sejam buscados de uma vez
     cobrancas = CobrancaMensalista.objects.select_related(
-        'cliente_mensalista__plano' # Já busca o plano
+        'cliente_mensalista__plano'
     ).all()
 
     if query_nome:
