@@ -144,7 +144,7 @@
 
                                     {# Botão Gerar #}
                                     {% if cliente.id %} 
-                                        <a href="{% url 'pagamentos:gerar_cobranca_imediata' cliente.id %}" class="btn btn-sm btn-warning" title="Gerar Nova Cobrança">
+                                        <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual' cliente.id %}" class="btn btn-sm btn-warning" title="Gerar Nova Cobrança">
                                             <i class="bi bi-plus-circle"></i> Gerar
                                         </a>
                                     {% else %}
