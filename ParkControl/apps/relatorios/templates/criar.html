@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Novo Relatório Financeiro{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Criar Relatório Financeiro</h2>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form|crispy }}
+
+    <button type="submit" class="btn btn-success">Gerar Relatório</button>
+    <a href="{% url 'relatorios:listar' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
