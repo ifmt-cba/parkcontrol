@@ -13,7 +13,6 @@ urlpatterns = [
     path('pagamentos/', include('apps.pagamentos.urls', namespace='pagamentos')),
     path('relatorios/', include('apps.relatorios.urls', namespace='relatorios')),
 
-
 ]
 
 
