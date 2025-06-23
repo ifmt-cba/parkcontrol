@@ -1,0 +1,67 @@
+{# apps/pagamentos/templates/pagamentos/mensalistas/editar_cobranca_mensalista_status.html #}
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %} Editar Cobrança {% endblock %}
+{% block content %}
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <h1 class="text-danger fw-bold mb-5">Editar Status da Cobrança #{{ cobranca.id }}</h1>
+
+        <div class="container bg-light p-4 rounded-4 shadow-sm text-start">
+            <p><strong>Cliente:</strong> {{ cobranca.cliente_mensalista.nome }}</p> 
+            <p><strong>Plano do Cliente:</strong> {{ cobranca.cliente_mensalista.plano|default:"N/A" }}</p>
+            <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
+            <p><strong>Valor Devido:</strong> R$ {{ cobranca.valor_devido|floatformat:2 }}</p>
+            <p><strong>Valor Pago Atualmente:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
+            <p><strong>Status Atual:</strong> <span class="badge bg-secondary">{{ cobranca.get_status_display }}</span></p>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label text-start d-block">
+                        {{ form.status.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.status|add_class:"form-select" }}
+                    {% for error in form.status.errors %}
+                        <div class="text-danger small text-start">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.valor_pago.id_for_label }}" class="form-label text-start d-block">
+                        {{ form.valor_pago.label }}
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        {{ form.valor_pago|add_class:"form-control" }}
+                    </div>
+                    {% for error in form.valor_pago.errors %}
+                        <div class="text-danger small text-start">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger text-start">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Salvar Alterações</button>
+            </form>
+        </div>
+    </main>
+{% endblock %}

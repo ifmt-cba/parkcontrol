@@ -1,0 +1,57 @@
+{# apps/pagamentos/templates/pagamentos/gerenciamento_pagamentos_home.html #}
+{% load static %} 
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerência de Pagamentos - ParkControl</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
+
+    <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
+        <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
+        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
+    </header>
+
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <h1 class="text-danger fw-bold mb-5">Gerência de Pagamentos</h1>
+
+        <div class="container">
+            <div class="row justify-content-center g-4">
+                <div class="col-10 col-sm-6 col-md-4">
+                    <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger w-100 fw-bold py-4 rounded-4">
+                        GERENCIAR<br>PAGAMENTOS<br>MENSALISTAS
+                    </a>
+                </div>
+                <div class="col-10 col-sm-6 col-md-4">
+                    <a href="{% url 'pagamentos:listar_cobrancas_diaristas' %}" class="btn btn-danger w-100 fw-bold py-4 rounded-4">
+                        GERENCIAR<br>PAGAMENTOS<br>DIARISTAS
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="pb-4">
+        <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
