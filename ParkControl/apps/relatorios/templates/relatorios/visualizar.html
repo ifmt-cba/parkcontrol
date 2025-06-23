@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Visualizar Relatório{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Relatório #{{ relatorio.id }}</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Período do Relatório</h5>
+      <p class="card-text fs-5">{{ relatorio.data_inicio|date:"d/m/Y" }} – {{ relatorio.data_fim|date:"d/m/Y" }}</p>
+
+      <h5 class="card-title mt-4 mb-3">Resumo Financeiro</h5>
+      <ul class="list-group list-group-flush fs-6">
+        <li class="list-group-item"><strong>Total Emitido:</strong> R$ {{ relatorio.total_emitido|floatformat:2 }}</li>
+        <li class="list-group-item"><strong>Total Pago:</strong> R$ {{ relatorio.total_pago|floatformat:2 }}</li>
+        <li class="list-group-item"><strong>Inadimplente:</strong> R$ {{ relatorio.total_inadimplente|floatformat:2 }}</li>
+        <li class="list-group-item"><strong>Status:</strong> {{ relatorio.status }}</li>
+      </ul>
+
+      <h5 class="card-title mt-4 mb-3">Informações Adicionais</h5>
+      <p class="mb-1"><strong>Criado por:</strong> {{ relatorio.criado_por }}</p>
+      <p class="mb-1"><strong>Criado em:</strong> {{ relatorio.data_criacao|date:"d/m/Y H:i:s" }}</p>
+      <p><strong>Última edição:</strong> {{ relatorio.editado_em|date:"d/m/Y H:i:s" }}</p>
+
+      {% if relatorio.arquivo_pdf %}
+      <a href="{{ relatorio.arquivo_pdf.url }}" target="_blank" class="btn btn-outline-secondary mt-3 me-2">
+        <i class="bi bi-file-earmark-pdf"></i> Baixar PDF
+      </a>
+      {% endif %}
+
+      <button class="btn btn-secondary mt-3 me-2" onclick="window.print()">
+        <i class="bi bi-printer"></i> Imprimir Recibo
+      </button>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'relatorios:listar' %}" class="btn btn-outline-secondary flex-grow-1">Voltar</a>
+    <a href="{% url 'relatorios:editar' relatorio.id %}" class="btn btn-warning flex-grow-1">Editar</a>
+    <a href="{% url 'relatorios:excluir' relatorio.id %}" class="btn btn-danger flex-grow-1">Excluir</a>
+  </div>
+</div>
+{% endblock %}

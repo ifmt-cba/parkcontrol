@@ -8,7 +8,7 @@
         <h1 class="display-4 mb-2 text-danger fw-bold">Contador</h1>
         
         <div class="d-flex flex-wrap gap-3 my-4">
-            <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <a href="{% url 'relatorios:listar' %}" class="btn btn-danger btn-lg flex-fill">
                 <i class="fas fa-file-alt me-2"></i> Gerência Relatórios Financeiros
             </a>
             <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger btn-lg flex-fill">

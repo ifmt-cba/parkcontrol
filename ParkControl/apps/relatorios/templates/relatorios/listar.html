@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatórios Financeiros{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Relatórios Financeiros</h2>
+  <a href="{% url 'relatorios:criar' %}" class="btn btn-primary mb-3">Novo Relatório</a>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Período</th>
+        <th>Total Emitido</th>
+        <th>Total Pago</th>
+        <th>Inadimplente</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in relatorios %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.data_inicio|date:"d/m/Y" }} – {{ r.data_fim|date:"d/m/Y" }}</td>
+        <td>R$ {{ r.total_emitido }}</td>
+        <td>R$ {{ r.total_pago }}</td>
+        <td>R$ {{ r.total_inadimplente }}</td>
+        <td>{{ r.status }}</td>
+        <td>
+          <a href="{% url 'relatorios:visualizar' r.id %}" class="btn btn-info btn-sm">Ver</a>
+          <a href="{% url 'relatorios:editar' r.id %}" class="btn btn-warning btn-sm">Editar</a>
+          <a href="{% url 'relatorios:excluir' r.id %}" class="btn btn-danger btn-sm">Excluir</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">Nenhum relatório disponível.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-secondary mt-3">Voltar</a>
+</div>
+{% endblock %}

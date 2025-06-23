@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Relatório{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-danger">Editar Relatório: {{ relatorio.nome }}</h2>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="{{ form.nome.id_for_label }}" class="form-label">Nome do Relatório</label>
+      {{ form.nome }}
+      {% if form.nome.errors %}
+        <div class="text-danger">{{ form.nome.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.data_inicio.id_for_label }}" class="form-label">Data Inicial</label>
+      {{ form.data_inicio }}
+      {% if form.data_inicio.errors %}
+        <div class="text-danger">{{ form.data_inicio.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.data_fim.id_for_label }}" class="form-label">Data Final</label>
+      {{ form.data_fim }}
+      {% if form.data_fim.errors %}
+        <div class="text-danger">{{ form.data_fim.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+      {{ form.status }}
+      {% if form.status.errors %}
+        <div class="text-danger">{{ form.status.errors }}</div>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-danger">Atualizar</button>
+    <a href="{% url 'relatorios:visualizar' relatorio.id %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

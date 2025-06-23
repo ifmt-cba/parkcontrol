@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Excluir Relatório #{{ relatorio.id }}</h2>
+  <p>Tem certeza que deseja remover este relatório permanentemente?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a href="{% url 'relatorios:visualizar' relatorio.id %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

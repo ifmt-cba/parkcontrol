@@ -12,4 +12,7 @@ urlpatterns = [
     path('manutencao/', include('apps.manutencao.urls', namespace='manutencao')),
     path('pagamentos/', include('apps.pagamentos.urls', namespace='pagamentos')),
     path('relatorios/', include('apps.relatorios.urls', namespace='relatorios')),
+
 ]
+
+
