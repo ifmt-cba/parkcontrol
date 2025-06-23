@@ -1,0 +1,112 @@
+{# apps/pagamentos/templates/pagamentos/mensalistas/listar_cobrancas.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Listagem de Cobranças - Mensalistas{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-danger fw-bold mb-4 text-center">Listagem de Cobranças (Mensalistas)</h1>
+
+    {# FORMULÁRIO DE FILTRO #}
+    <form method="GET" class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-3">
+            <label for="id_nome_cliente" class="form-label">Nome do Cliente</label>
+            <input type="text" name="nome_cliente" id="id_nome_cliente" class="form-control" value="{{ query_nome }}">
+        </div>
+
+        <div class="col-md-3">
+            <label for="id_plano" class="form-label">Nome do Plano</label>
+            <input type="text" name="plano" id="id_plano" class="form-control" value="{{ query_plano }}" placeholder="Ex: Integral">
+        </div>
+
+        <div class="col-md-2">
+            <label for="id_mes_referencia" class="form-label">Mês/Ano Ref.</label>
+            <input type="text" name="mes_referencia" id="id_mes_referencia" class="form-control" value="{{ query_mes }}" placeholder="MM/AAAA">
+        </div>
+
+        <div class="col-md-2">
+            <label for="id_status" class="form-label">Status Pagamento</label>
+            <select name="status" id="id_status" class="form-select">
+                <option value="">Todos</option> 
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-danger w-100">Filtrar</button>
+        </div>
+    </form>
+
+    {# TABELA DE COBRANÇAS #}
+    {% if page_obj.object_list %}
+        <p class="text-center fw-bold mt-4">{{ page_obj.object_list|length }} cobrança{{ page_obj.object_list|length|pluralize }} encontrada{{ page_obj.object_list|length|pluralize }}.</p>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Placa</th>
+                        <th>Status Cliente</th>
+                        <th>Status Pagamento</th>
+                        <th>Plano</th>
+                        <th>Mês Ref.</th>
+                        <th>Valor Devido</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cobranca in page_obj.object_list %}
+                        <tr>
+                            <td>{{ cobranca.cliente_mensalista.nome }}</td>
+                            <td>{{ cobranca.cliente_mensalista.placa }}</td>
+                            <td>{{ cobranca.cliente_mensalista.ativo|yesno:"Ativo,Inativo" }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if cobranca.status == 'pendente' %}bg-warning text-dark
+                                    {% elif cobranca.status == 'pago' %}bg-success
+                                    {% elif cobranca.status == 'parcialmente_pago' %}bg-info text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ cobranca.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ cobranca.cliente_mensalista.plano.nome|default:"N/A" }}</td>
+                            <td>{{ cobranca.mes_referencia }}</td>
+                            <td>R$ {{ cobranca.valor_devido|floatformat:2 }}</td>
+                            <td>
+                                <a href="{% url 'pagamentos:detalhe_cobranca_mensalista' cobranca.id %}" class="btn btn-info btn-sm">Detalhes</a>
+                                {% if not cobranca.esta_paga %}
+                                    <a href="{% url 'pagamentos:editar_cobranca_mensalista_status' cobranca.id %}" class="btn btn-warning btn-sm">Editar Status</a>
+                                {% endif %}
+                                <a href="{% url 'pagamentos:excluir_cobranca_mensalista' cobranca.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Controles de Paginação #}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&nome_cliente={{ query_nome }}&plano={{ query_plano }}&mes_referencia={{ query_mes }}&status={{ status_filter }}">Anterior</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&nome_cliente={{ query_nome }}&plano={{ query_plano }}&mes_referencia={{ query_mes }}&status={{ status_filter }}">Próxima</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    {% else %}
+        <p class="text-center text-muted fw-bold mt-4">Nenhuma cobrança de mensalista encontrada com os filtros aplicados.</p>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <a href="{% url 'pagamentos:gerenciamento_pagamentos_home' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+    </div>
+</div>
+{% endblock %}

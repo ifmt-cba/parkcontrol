@@ -1,0 +1,44 @@
+{# apps/pagamentos/templates/pagamentos/recibo.html #}
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %} Recibo de Pagamento {% endblock %}
+{% block content %}
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
+        <div class="container bg-white p-5 rounded-4 shadow-lg" style="max-width: 600px; border: 1px solid #ddd;">
+            <h2 class="text-center text-danger mb-4">RECIBO DE PAGAMENTO</h2>
+            
+            <div class="text-start mb-4">
+                <p><strong>Recebemos de:</strong>
+                    {% if tipo_cobranca == 'mensalista' %}
+                        {{ cobranca.cliente_mensalista.nome }}
+                        {% if cobranca.cliente_mensalista.email %} ({{ cobranca.cliente_mensalista.email }}){% endif %}
+                    {% else %}
+                        Veículo {{ cobranca.movimento.placa_veiculo }}
+                    {% endif %}
+                </p>
+                <p><strong>A quantia de:</strong> R$ {{ cobranca.valor_pago|floatformat:2 }}</p>
+                <p><strong>Referente a:</strong> {{ cobranca.get_status_display }} da Cobrança #{{ cobranca.id }}</p>
+                {% if tipo_cobranca == 'mensalista' %}
+                <p><strong>Mês de Referência:</strong> {{ cobranca.mes_referencia }}</p>
+                {% else %}
+                    <p><strong>Movimento:</strong> Entrada: {{ cobranca.movimento.hora_entrada|date:"d/m/Y H:i" }} / Saída: {{ cobranca.movimento.hora_saida|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+                <p><strong>Data de Emissão:</strong> {{ data_emissao|date:"d/m/Y H:i" }}</p>
+            </div>
+
+            <h3 class="text-center text-danger my-4">VALOR TOTAL PAGO: R$ {{ cobranca.valor_pago|floatformat:2 }}</h3>
+
+            <div class="text-center mt-5">
+                <p class="mt-4"><strong>{{ nome_estacionamento }}</strong></p>
+                <br>
+                <button class="btn btn-secondary px-4" onclick="window.print()">
+                     Imprimir recibo
+                </button>
+            <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar </a>
+            </div>
+        </div>
+    </main>
+{% endblock %}

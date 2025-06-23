@@ -11,10 +11,8 @@
             <a href="{% url 'relatorios:listar' %}" class="btn btn-danger btn-lg flex-fill">
                 <i class="fas fa-file-alt me-2"></i> Gerência Relatórios Financeiros
             </a>
- 
-
-            <a href="#" class="btn btn-danger btn-lg flex-fill">
-                <i class="fas fa-users-cog me-2"></i> Gerência de Pagamentos
+            <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_lista_clientes' %}" class="btn btn-danger btn-lg flex-fill">
+                <i class="fas fa-users-cog me-2"></i> Gerência de Pagamentos Mensalistas
             </a>
         </div>
     </div>
