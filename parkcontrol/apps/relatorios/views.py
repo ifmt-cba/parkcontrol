@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import RelatorioFinanceiro
 from .forms import FormularioRelatorioFinanceiro
-# from apps.pagamentos.models import CobrancaMensalista
+from apps.pagamentos.models import CobrancaMensalista
 from apps.pagamentos.models import CobrancaDiaria
 from django.db.models import Sum
 
