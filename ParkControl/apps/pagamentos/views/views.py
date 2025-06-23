@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 import calendar
 import re 
 
-# Importações de outros apps permanecem como estão (ex: apps.clientes.models)
+# ---Importações de outros apps ---
 from apps.clientes.models import Mensalista
 from apps.planos.models import Planos
 
@@ -26,7 +26,6 @@ from ..models import CobrancaMensalista
 from ..forms import GerarCobrancaMensalForm, CobrancaMensalistaStatusForm
 
 # --- Views para Contador (Gerenciamento de Pagamentos) ---
-
 
 def gerenciamento_pagamentos_home(request):
     """

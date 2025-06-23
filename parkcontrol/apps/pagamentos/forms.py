@@ -4,7 +4,6 @@ from apps.planos.models import Planos
 from .models import CobrancaMensalista 
 from django.core.exceptions import ValidationError
 from decimal import Decimal
-import re
 from datetime import date 
 
 class GerarCobrancaMensalForm(forms.Form):

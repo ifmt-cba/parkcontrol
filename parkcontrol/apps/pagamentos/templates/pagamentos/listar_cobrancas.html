@@ -51,7 +51,7 @@
                         <th>Placa</th>
                         <th>Status Cliente</th>
                         <th>Status Pagamento</th>
-                        <th>Plano</th> {# Coluna do Plano #}
+                        <th>Plano</th>
                         <th>Mês Ref.</th>
                         <th>Valor Devido</th>
                         <th>Ações</th>
@@ -72,7 +72,7 @@
                                     {{ cobranca.get_status_display }}
                                 </span>
                             </td>
-                            <td>{{ cobranca.cliente_mensalista.plano.nome|default:"N/A" }}</td> {# Exibindo o nome do plano #}
+                            <td>{{ cobranca.cliente_mensalista.plano.nome|default:"N/A" }}</td>
                             <td>{{ cobranca.mes_referencia }}</td>
                             <td>R$ {{ cobranca.valor_devido|floatformat:2 }}</td>
                             <td>

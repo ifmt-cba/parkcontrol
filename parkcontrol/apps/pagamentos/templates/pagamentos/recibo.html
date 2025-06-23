@@ -28,7 +28,7 @@
                     {% if tipo_cobranca == 'mensalista' %}
                         {{ cobranca.cliente_mensalista.nome }}
                         {% if cobranca.cliente_mensalista.email %} ({{ cobranca.cliente_mensalista.email }}){% endif %}
-                    {% else %} {# diarista #}
+                    {% else %}
                         Veículo {{ cobranca.movimento.placa_veiculo }}
                     {% endif %}
                 </p>

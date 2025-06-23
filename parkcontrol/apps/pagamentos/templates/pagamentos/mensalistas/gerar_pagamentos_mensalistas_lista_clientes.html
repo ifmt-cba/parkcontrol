@@ -1,16 +1,12 @@
 {# apps/pagamentos/templates/pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html #}
+{% extends 'base.html' %}
 {% load static %}
-{% load form_tags %} 
+{% load form_tags %}
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ titulo_pagina }} - ParkControl</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}{{ titulo_pagina }} - ParkControl{% endblock %}
+
+{% block extra_head %}
     <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         .table-custom-header th {
             background-color: var(--bs-danger); 
@@ -18,31 +14,42 @@
             font-weight: bold;
             vertical-align: middle;
         }
+        td, th {
+            vertical-align: middle;
+        }
         .action-cell {
             display: flex;
-            flex-direction: row; /* HORIZONTAL */
+            flex-direction: row;
             flex-wrap: wrap; 
             justify-content: center; 
             align-items: center; 
-            gap: 5px; /* Espaçamento entre os botões */
+            gap: 5px;
             padding: 5px; 
         }
         .action-cell .btn {
-            font-size: 0.75rem; /* Fonte menor */
-            padding: 0.2rem 0.5rem; /* Preenchimento menor */
-            line-height: 1.2; /* Altura da linha para texto pequeno */
-            white-space: nowrap; /* Evita quebra de linha no texto do botão */
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            box-shadow: none;
+            margin: 0;
+        }
+        .btn-warning {
+            box-shadow: none !important;
+            margin: 0 !important;
         }
         .status-badge {
             font-size: 0.85em;
             padding: 0.4em 0.7em;
             border-radius: 0.3em;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center; 
         }
         .status-pendente { background-color: #ffc107; color: #343a40; } 
         .status-pago { background-color: #28a745; color: white; } 
-        .status-cancelado { background-color: #dc3545; color: white; } 
+        .status-cancelado { background-color: #dc3545; color: white; }
 
-        /* --- ESTILOS PARA DIMINUIR O BLOCO DE FILTRO --- */
         .filter-form .form-group { margin-bottom: 0.5rem; }
         .filter-form label { font-size: 0.85rem; margin-bottom: 0.2rem; }
         .filter-form .form-control, .filter-form .form-select, .filter-form .btn {
@@ -54,121 +61,110 @@
             .filter-form .row.g-3.align-items-end { align-items: flex-end; }
         }
     </style>
-</head>
-<body class="bg-white text-center d-flex flex-column justify-content-between" style="min-height: 100vh;">
+{% endblock %}
 
-    <header class="bg-danger py-2 px-4 d-flex justify-content-between align-items-center">
-        <img src="{% static 'clientes/img/logo.png' %}" alt="Logo ParkControl" style="height: 40px;">
-        <a href="{% url 'usuarios:logout_parkcontrol' %}" class="btn btn-light rounded-4 fw-bold">SAIR</a>
-    </header>
-
-    <div class="container mt-3">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    <main class="flex-grow-1 d-flex flex-column align-items-center py-5">
-        <h1 class="text-danger fw-bold mb-5">{{ titulo_pagina }}</h1>
-
-        <div class="container bg-light p-4 rounded-4 shadow-sm mb-4">
-            <form method="GET" class="row g-3 align-items-end filter-form"> 
-                <div class="col-md-4 form-group"> 
-                    <label for="id_nome_cliente" class="form-label text-start d-block">Buscar por Nome</label>
-                    <input type="text" name="nome_cliente" id="id_nome_cliente" class="form-control" value="{{ query_nome }}" placeholder="Nome do cliente">
-                </div>
-                <div class="col-md-3 form-group"> 
-                    <label for="id_status" class="form-label text-start d-block">Status Cliente</label>
-                    <select name="status" id="id_status" class="form-select">
-                        {% for value, label in status_choices %}
-                            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3 form-group"> 
-                    <label for="id_placa_veiculo" class="form-label text-start d-block">Placa</label>
-                    <input type="text" name="placa_veiculo" id="id_placa_veiculo" class="form-control" value="{{ query_placa }}" placeholder="ABC1D23">
-                </div>
-                <div class="col-md-2 form-group"> 
-                    <button class="btn btn-danger w-100" type="submit">Filtrar</button>
-                </div>
-            </form>
-        </div>
-
-        {% if page_obj.object_list %}
-            <div class="container bg-light p-4 rounded-4 shadow-sm">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead>
-                            <tr class="table-custom-header"> 
-                                <th>Nome</th>
-                                <th>Plano</th> 
-                                <th>Status Cliente</th>
-                                <th>Status do Pagamento</th> {# <-- NOVA COLUNA PARA O STATUS DO PAGAMENTO (CAIXA VERDE) #}
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in page_obj %} 
-                            {% with cliente=item.obj ultima_cobranca=item.ultima_cobranca cobranca_pendente_para_email=item.cobranca_pendente_para_email %}
-                            <tr>
-                                <td>{{ cliente.nome }}</td>
-                                <td>{{ cliente.plano|default:"N/A" }}</td> 
-                                <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
-                                <td>
-                                    {% if ultima_cobranca %}
-                                        <span class="status-badge status-{{ ultima_cobranca.status }}">
-                                            {{ ultima_cobranca.get_status_display }}
-                                        </span>
-                                    {% else %}
-                                        Nenhuma cobrança
-                                    {% endif %}
-                                </td>
-                                <td class="action-cell"> 
-                                    
-                                    {# Botão Editar Status (que é tipo o gerenciar) #}
-                                    {% if ultima_cobranca %}
-                                        <a href="{% url 'pagamentos:editar_cobranca_mensalista_status' ultima_cobranca.id %}" class="btn btn-sm btn-secondary" title="Editar Status da Cobrança">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </a>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-secondary" disabled title="Sem cobranças para editar">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
-                                    {% endif %}
-
-                                    {# Botão Gerar #}
-                                    {% if cliente.id %} 
-                                        <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual' cliente.id %}" class="btn btn-sm btn-warning" title="Gerar Nova Cobrança">
-                                            <i class="bi bi-plus-circle"></i> Gerar
-                                        </a>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-warning" disabled title="ID de cliente ausente">
-                                            <i class="bi bi-plus-circle"></i> Gerar (Erro)
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endwith %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+{% block content %}
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        {% else %}
-            <p class="mt-4">Nenhum cliente ativo encontrado com os filtros informados.</p>
-        {% endif %}
-    </main>
+        {% endfor %}
+    {% endif %}
+</div>
 
-    <footer class="pb-4">
-        <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
-    </footer>
+<div class="container text-center">
+    <h1 class="text-danger fw-bold mb-5">{{ titulo_pagina }}</h1>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<div class="container bg-light p-4 rounded-4 shadow-sm mb-4">
+    <form method="GET" class="row g-3 align-items-end filter-form"> 
+        <div class="col-md-4 form-group"> 
+            <label for="id_nome_cliente" class="form-label text-start d-block">Buscar por Nome</label>
+            <input type="text" name="nome_cliente" id="id_nome_cliente" class="form-control" value="{{ query_nome }}" placeholder="Nome do cliente">
+        </div>
+        <div class="col-md-3 form-group"> 
+            <label for="id_status" class="form-label text-start d-block">Status Cliente</label>
+            <select name="status" id="id_status" class="form-select">
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 form-group"> 
+            <label for="id_placa_veiculo" class="form-label text-start d-block">Placa</label>
+            <input type="text" name="placa_veiculo" id="id_placa_veiculo" class="form-control" value="{{ query_placa }}" placeholder="ABC1D23">
+        </div>
+        <div class="col-md-2 form-group"> 
+            <button class="btn btn-danger w-100" type="submit">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+{% if page_obj.object_list %}
+    <div class="container bg-light p-4 rounded-4 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr class="table-custom-header"> 
+                        <th>Nome</th>
+                        <th>Plano</th> 
+                        <th>Status Cliente</th>
+                        <th>Status do Pagamento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_obj %} 
+                    {% with cliente=item.obj ultima_cobranca=item.ultima_cobranca %}
+                    <tr>
+                        <td>{{ cliente.nome }}</td>
+                        <td>{{ cliente.plano|default:"N/A" }}</td> 
+                        <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
+                        <td class="text-center">
+                            {% if ultima_cobranca %}
+                                <span class="status-badge status-{{ ultima_cobranca.status }}">
+                                    {{ ultima_cobranca.get_status_display }}
+                                </span>
+                            {% else %}
+                                Nenhuma cobrança
+                            {% endif %}
+                        </td>
+                        <td class="action-cell"> 
+                            {% if ultima_cobranca %}
+                                <a href="{% url 'pagamentos:editar_cobranca_mensalista_status' ultima_cobranca.id %}" class="btn btn-sm btn-secondary" title="Editar Status da Cobrança">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled title="Sem cobranças para editar">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                            {% endif %}
+
+                            {% if cliente.id %} 
+                                <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual' cliente.id %}" class="btn btn-sm btn-warning" title="Gerar Nova Cobrança">
+                                    <i class="bi bi-plus-circle"></i> Gerar
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm btn-warning" disabled title="ID de cliente ausente">
+                                    <i class="bi bi-plus-circle"></i> Gerar (Erro)
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <p class="mt-4 text-center text-muted">Nenhum cliente ativo encontrado com os filtros informados.</p>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
+</div>
+{% endblock %}
