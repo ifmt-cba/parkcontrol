@@ -39,9 +39,17 @@
         </div>
     </div>
 
-      <footer class="d-flex justify-content-between mt-5">
-        <a href="{% url 'frentistas:gerenciar_vagas' %}" class="btn btn-danger px-4 py-2 rounded-4 fw-bold">Voltar</a>
-      </footer>
+      
+        <div class="d-flex gap-3 mb-3">
+            <button type="button" class="btn btn-secondary px-4" onclick="window.print()">
+                Imprimir
+            </button>
+            <a href="javascript:history.back()" class="btn btn-danger text-light">
+                Voltar
+            </a>
+        </div>
+
+
       
 </div>
 {% endblock %}

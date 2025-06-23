@@ -7,7 +7,7 @@
     <div class="container mt-5">
         <h1 class="display-4 mb-2 text-danger fw-bold">Administrador</h1>
         <div class="d-flex flex-wrap gap-3 my-4">
-            <a href="#" class="btn btn-danger btn-lg flex-fill">
+            <a href="{% url 'relatorios:dashboard_relatorios' %}" class="btn btn-danger btn-lg flex-fill">
                 <i class="fas fa-file-alt me-2"></i> Gerência Relatórios
             </a>
             <a href="{% url 'usuarios:gerencia_usuarios' %}" class="btn btn-danger btn-lg flex-fill">
