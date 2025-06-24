@@ -1,4 +1,6 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
+
 
 # Create your models here.
 class Planos(models.Model):
@@ -32,6 +34,8 @@ class Planos(models.Model):
     # Informações somente do plano Mensalista
     valor = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     tipo_mensal  = models.CharField(max_length=20, choices=TIPO_MENSAL_CHOICES, blank=True, null=True)
+
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
 
     def __str__(self):
      return self.nome

@@ -1,9 +1,8 @@
 from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
-
 from apps.clientes import views
 
-from .views import views_autenticacao, views_dashboard, views_gerencia_usuario, views_perfil, views_gerencia_cliente
+from .views import views_autenticacao, views_historico, views_dashboard, views_gerencia_usuario, views_perfil, views_gerencia_cliente
 
 
 app_name = "usuarios"  # Define o namespace para o app usuarios
@@ -75,4 +74,8 @@ urlpatterns = [
     path("gerencia_cliente/", views_gerencia_cliente.gerencia_cliente, name='gerencia_cliente'),
     path('mensalistas/', views.cliente_mensalista_view, name='cliente_mensalista'),
     path('diaristas/', views.cliente_diarista_view, name='cliente_diarista'),
+
+    path('historico/', views_historico.historico, name='dashboard_historico'),
+    path('historico/vagas/', views_historico.historico_vagas, name='historico_vagas'),
+
 ]

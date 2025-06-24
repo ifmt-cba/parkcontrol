@@ -1,3 +1,4 @@
+from simple_history.models import HistoricalRecords
 from django.db import models
 from django.core.validators import RegexValidator
 from apps.planos.models import Planos
@@ -36,7 +37,7 @@ class Mensalista(models.Model):
     )
    
     ativo = models.BooleanField(default=True)
-
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
     def __str__(self):
         return f'Nome: {self.nome} - Placa: {self.placa} - Plano: {self.plano} - Telefone: {self.telefone} - Email: {self.email} - Status: {"Ativo" if self.ativo else "Inativo"}'
 
@@ -72,6 +73,6 @@ class Diarista(models.Model):
     )
 
     ativo = models.BooleanField(default=True)
-
+    historico = HistoricalRecords()
     def __str__(self):
         return f'Nome: {self.nome} - Placa: {self.placa} - Telefone: {self.telefone} - Status: {"Ativo" if self.ativo else "Inativo"}'

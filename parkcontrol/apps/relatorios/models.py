@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from simple_history.models import HistoricalRecords
 
 class RelatorioFinanceiro(models.Model):
     STATUS_CHOICES = [
@@ -21,6 +22,8 @@ class RelatorioFinanceiro(models.Model):
 
     arquivo_pdf = models.FileField(upload_to="relatorios_pdfs/", null=True, blank=True)
 
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
+    
     def __str__(self):
         return f"{self.nome} ({self.status}) - {self.data_criacao.strftime('%d/%m/%Y')}"
 

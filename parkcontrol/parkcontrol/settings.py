@@ -34,12 +34,14 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     # Apps nativos do Django
+    'apps.auditoria',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',  # Para histórico de alterações nos modelos
     
     # Apps da aplicação
     'apps.clientes',
@@ -59,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',  # Middleware para histórico de alterações
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
