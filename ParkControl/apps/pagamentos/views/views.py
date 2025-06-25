@@ -44,6 +44,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
     Lista clientes Mensalista
     """
     query_nome = request.GET.get('nome_cliente', '').strip()
+    query_plano = request.GET.get('plano', '').strip()
     status_filter = request.GET.get('status', 'ativo').strip()
     query_placa = request.GET.get('placa_veiculo', '').strip()
 
@@ -57,6 +58,9 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
     
     if query_nome:
         clientes_filtrados = clientes_filtrados.filter(nome__icontains=query_nome) 
+
+    if query_plano:
+        clientes_filtrados = clientes_filtrados.filter(plano__nome__icontains=query_plano)
 
     if query_placa:
         clientes_filtrados = clientes_filtrados.filter(placa__icontains=query_placa)
@@ -87,6 +91,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
         'page_obj': page_obj, 
         'query_nome': query_nome,
+        'query_plano': query_plano,
         'status_filter': status_filter,
         'query_placa': query_placa,
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]

@@ -1,81 +1,66 @@
 {# apps/pagamentos/templates/pagamentos/mensalistas/gerar_pagamentos_mensalistas_lista_clientes.html #}
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load static %}
-{% load form_tags %} 
+{% load form_tags %}
 
-{% block title %}{{ titulo_pagina }} - ParkControl{% endblock %} 
+{% block title %}{{ titulo_pagina }} - ParkControl{% endblock %}
 
-{% block extra_head %} 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}">
-    <style>
-        .table-custom-header th {
-            background-color: var(--bs-danger); 
-            color: white; 
-            font-weight: bold;
-            vertical-align: middle;
-        }
-        td, th {
-            vertical-align: middle;
-        }
-        .action-cell {
-            display: flex;
-            flex-direction: row; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 5px; 
-            padding: 5px;
-            flex-grow: 1;
-            flex-shrink: 0;
-        }
-        .action-cell .btn {
-            font-size: 0.8rem;
-            padding: 0.4rem 0.8rem;
-            line-height: 1.2;
-            white-space: nowrap;
-            box-shadow: none;
-            margin: 0;
-        }
-        .btn-warning {
-            box-shadow: none !important;
-            margin: 0 !important;
-        }
-        .status-badge {
-            font-size: 0.85em;
-            padding: 0.6em 1em; 
-            border-radius: 0.3em;
-            display: inline-block;
-            min-width: 120px; 
-            text-align: center; 
-        }
-        .status-pendente { background-color: #ffc107; color: #343a40; } 
-        .status-pago { background-color: #28a745; color: white; } 
-        .status-cancelado { background-color: #dc3545; color: white; }
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'clientes/css/cadastro_clientes.css' %}">
+<style>
+    .table-custom-header th {
+        background-color: var(--bs-danger);
+        color: white;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+    td, th {
+        vertical-align: middle;
+    }
+    .action-cell {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+        padding: 5px;
+    }
+    .action-cell .btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        white-space: nowrap;
+        box-shadow: none;
+    }
+    .status-badge {
+        font-size: 0.85em;
+        padding: 0.6em 1em;
+        border-radius: 0.3em;
+        min-width: 120px;
+        text-align: center;
+        display: inline-block;
+    }
+    .status-pendente { background-color: #ffc107; color: #343a40; }
+    .status-pago { background-color: #28a745; color: white; }
+    .status-cancelado { background-color: #dc3545; color: white; }
 
-        .filter-form .form-group { margin-bottom: 0.5rem; }
-        .filter-form label { font-size: 0.85rem; margin-bottom: 0.2rem; }
-        .filter-form .form-control, .filter-form .form-select, .filter-form .btn {
-            height: calc(1.5em + 0.5rem + 2px); 
-            padding: 0.25rem 0.5rem; 
-            font-size: 0.85rem; 
-        }
-        @media (min-width: 768px) {
-            .filter-form .row.g-3.align-items-end { align-items: flex-end; }
-        }
-    </style>
+    .filter-form .form-group { margin-bottom: 0.5rem; }
+    .filter-form label { font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .filter-form .form-control, .filter-form .form-select, .filter-form .btn {
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-3">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 </div>
 
 <div class="container text-center">
@@ -83,19 +68,19 @@
 </div>
 
 <div class="container bg-light p-4 rounded-4 shadow-sm mb-4">
-    <form method="GET" class="row g-3 align-items-end filter-form"> 
-        <div class="col-md-3 form-group"> 
-            <label for="id_nome_cliente" class="form-label text-start d-block">Buscar por Nome</label>
+    <form method="GET" class="row g-3 align-items-end filter-form">
+        <div class="col-md-3">
+            <label for="id_nome_cliente">Buscar por Nome</label>
             <input type="text" name="nome_cliente" id="id_nome_cliente" class="form-control" value="{{ query_nome }}" placeholder="Nome do cliente">
         </div>
-        
-        <div class="col-md-3 form-group"> 
-            <label for="id_plano" class="form-label text-start d-block">Filtrar por Plano</label>
+
+        <div class="col-md-3">
+            <label for="id_plano">Filtrar por Plano</label>
             <input type="text" name="plano" id="id_plano" class="form-control" value="{{ query_plano }}" placeholder="Nome do Plano">
         </div>
 
-        <div class="col-md-2 form-group"> 
-            <label for="id_status" class="form-label text-start d-block">Status Cliente</label>
+        <div class="col-md-2">
+            <label for="id_status">Status Cliente</label>
             <select name="status" id="id_status" class="form-select">
                 {% for value, label in status_choices %}
                     <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
@@ -103,89 +88,91 @@
             </select>
         </div>
 
-        <div class="col-md-2 form-group"> 
-            <label for="id_placa_veiculo" class="form-label text-start d-block">Placa</label>
+        <div class="col-md-2">
+            <label for="id_placa_veiculo">Placa</label>
             <input type="text" name="placa_veiculo" id="id_placa_veiculo" class="form-control" value="{{ query_placa }}" placeholder="ABC1D23">
         </div>
 
-        <div class="col-md-2 form-group"> 
+        <div class="col-md-2">
             <button class="btn btn-danger w-100" type="submit">Filtrar</button>
         </div>
     </form>
 </div>
 
 {% if page_obj.object_list %}
-    <div class="container bg-light p-4 rounded-4 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead>
-                    <tr class="table-custom-header"> 
-                        <th>Nome</th>
-                        <th>Plano</th> 
-                        <th>Status Cliente</th>
-                        <th>Status do Pagamento</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in page_obj %} 
-                    {% with cliente=item.obj ultima_cobranca=item.ultima_cobranca cobranca_pendente_para_email=item.cobranca_pendente_para_email %}
+<div class="container bg-light p-4 rounded-4 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr class="table-custom-header">
+                    <th>Nome</th>
+                    <th>Plano</th>
+                    <th>Status Cliente</th>
+                    <th>Status do Pagamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                    {% with cliente=item.obj ultima_cobranca=item.ultima_cobranca %}
                     <tr>
                         <td>{{ cliente.nome }}</td>
-                        <td>{{ cliente.plano.nome|default:"N/A" }}</td> 
+                        <td>{{ cliente.plano.nome|default:"N/A" }}</td>
                         <td>{{ cliente.ativo|yesno:"Ativo,Inativo" }}</td>
-                        <td class="text-center"> 
+                        <td class="text-center">
                             {% if ultima_cobranca %}
-                                <div class="d-flex flex-column align-items-center"> 
-                                    <span class="status-badge status-{{ ultima_cobranca.status }}"> 
+                                <div class="d-flex flex-column align-items-center">
+                                    <span class="status-badge status-{{ ultima_cobranca.status }}">
                                         {{ ultima_cobranca.get_status_display }}
                                     </span>
-                                    <small class="text-muted">(Ref: {{ ultima_cobranca.mes_referencia }})</small> 
+                                    <small class="text-muted">(Ref: {{ ultima_cobranca.mes_referencia }})</small>
                                 </div>
                             {% else %}
                                 Nenhuma cobrança
                             {% endif %}
                         </td>
-                        <td class="action-cell">
-                            <div class="d-flex gap-2 flex-wrap justify-content-start" style="white-space: nowrap;">
-                            <a href="{% url 'pagamentos:listar_cobrancas_cliente' cliente.id %}" class="btn btn-sm btn-info me-1" title="Visualizar Cobranças do Cliente">
-                                <i class="bi bi-eye"></i> Visualizar
-                            </a>
-                        
-                            {% if ultima_cobranca %}
-                                <a href="{% url 'pagamentos:editar_cobranca_mensalista_status' ultima_cobranca.id %}" class="btn btn-sm btn-secondary me-1" title="Editar Status da Cobrança">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                            {% else %}
-                                <button class="btn btn-sm btn-secondary me-1" disabled title="Sem cobranças para editar">
-                                    <i class="bi bi-pencil"></i> Editar
+                        <td class="text-center">
+                            <div class="dropdown">
+                                <button class="btn btn-danger btn-sm dropdown-toggle rounded-3 fw-bold px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-list"></i>
                                 </button>
-                            {% endif %}
-                            
-                            {% if cliente.id %} 
-                                <a href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual' cliente.id %}" class="btn btn-sm btn-warning" title="Gerar Nova Cobrança Mensal (Manual)">
-                                    <i class="bi bi-plus-circle"></i> Gerar
-                                </a>
-                            {% else %}
-                                <button class="btn btn-sm btn-warning" disabled title="ID de cliente ausente">
-                                    <i class="bi bi-plus-circle"></i> Gerar (Erro)
-                                </button>
-                            {% endif %}
+                                <ul class="dropdown-menu shadow-sm rounded-3">
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'pagamentos:listar_cobrancas_cliente' cliente.id %}">
+                                            <i class="bi bi-eye text-info"></i> Visualizar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        {% if ultima_cobranca %}
+                                            <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'pagamentos:editar_cobranca_mensalista_status' ultima_cobranca.id %}">
+                                                <i class="bi bi-pencil text-secondary"></i> Editar
+                                            </a>
+                                        {% else %}
+                                            <span class="dropdown-item text-muted d-flex align-items-center gap-2 disabled">
+                                                <i class="bi bi-pencil"></i> Editar (indisp.)
+                                            </span>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'pagamentos:gerar_pagamentos_mensalistas_manual' cliente.id %}">
+                                            <i class="bi bi-plus-circle text-warning"></i> Gerar
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
                         </td>
                     </tr>
                     {% endwith %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 {% else %}
-    <p class="mt-4 text-center fw-bold text-muted">Nenhum cliente ativo encontrado com os filtros aplicados.</p>
+    <p class="mt-4 text-center text-muted fw-bold">Nenhum cliente encontrado com os filtros aplicados.</p>
 {% endif %}
 
-<footer class="pb-4">
-    <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 rounded-4 fw-bold">Voltar</a>
-</footer>
-
+<div class="container text-center pt-4">
+    <a href="{% url 'usuarios:dashboard_contador' %}" class="btn btn-danger px-5 py-2 fw-bold rounded-4">Voltar</a>
+</div>
 {% endblock %}

@@ -9,7 +9,6 @@ class CobrancaMensalistaTestCase(TestCase):
     def setUp(self):
         self.mensalista = Mensalista.objects.create(
             nome='João da Silva',
-            cpf='12345678901',
             email='joao@example.com',
             telefone='(11) 99999-9999',
             placa='ABC1234',
