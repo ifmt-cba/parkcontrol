@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.conf import settings
 from django.urls import include, path
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,6 +15,6 @@ urlpatterns = [
     path('pagamentos/', include('apps.pagamentos.urls', namespace='pagamentos')),
     path('relatorios/', include('apps.relatorios.urls', namespace='relatorios')),
 
-]
-
-
+] 
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
