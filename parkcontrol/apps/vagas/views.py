@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -8,9 +9,12 @@ from .models import EntradaVeiculo, SaidaVeiculo, SolicitacaoManutencao, Vaga
 from django.utils import timezone
 from .forms import EntradaVeiculoForm, SaidaVeiculoForm, SolicitacaoManutencaoForm
 
+logger = logging.getLogger('vagas')
+
 def registrar_entrada_view(request):
     if request.method == 'POST':
         form = EntradaVeiculoForm(request.POST)
+
         if form.is_valid():
             entrada = form.save(commit=False)
 
@@ -18,9 +22,10 @@ def registrar_entrada_view(request):
             cliente = Mensalista.objects.filter(placa__iexact=entrada.placa).first()
             if not cliente:
                 cliente = Diarista.objects.filter(placa__iexact=entrada.placa).first()
-            
+            logger.info(f"Registro de entrada iniciado para placa {entrada.placa} por {request.user}")
             if not cliente:
                 messages.error(request, 'Cliente não cadastrado. Cadastre o cliente antes de registrar a entrada.')
+                logger.warning(f"Cliente não encontrado para placa {entrada.placa}")
                 return render(request, 'vagas/entrada.html', {'form': form})
             
             entrada.nome = cliente.nome  # 🆗 Atribui o nome automaticamente
@@ -32,17 +37,15 @@ def registrar_entrada_view(request):
             ).exists()
 
             if entrada_existente:
-                messages.error(request, 'Entrada já registrada para essa placa e ainda sem saída.')
-                return render(request, 'vagas/entrada.html', {'form': form})
-
-            if entrada_existente:
                 messages.error(request, 'Entrada já registrada para essa placa.')
+                logger.warning(f"Entrada duplicada para placa {entrada.placa}")
                 return render(request, 'vagas/entrada.html', {'form': form})
 
             # 🔐 Verifica se a vaga está livre
             vaga = entrada.vaga
             if vaga.status != 'Livre':
                 messages.error(request, f'A vaga {vaga.numero} não está disponível.')
+                logger.warning(f"Vaga {vaga.numero} não está livre (status: {vaga.status})")
                 return render(request, 'vagas/entrada.html', {'form': form})
 
             # 🚗 Salva entrada e atualiza status da vaga
@@ -51,6 +54,7 @@ def registrar_entrada_view(request):
 
             entrada.save()
             messages.success(request, 'Entrada registrada com sucesso!')
+            logger.info(f"Entrada registrada: placa={entrada.placa}, vaga={vaga.numero}, por {request.user}")
             return redirect('vagas:registrar_entrada')
     else:
         form = EntradaVeiculoForm()
@@ -64,9 +68,11 @@ def buscar_nome_por_placa(request):
     if placa:
         cliente = Mensalista.objects.filter(placa__iexact=placa).first()
         if cliente:
+            logger.info(f"Nome buscado por placa: {placa}, tipo: {tipo_cliente}")
             nome = cliente.nome
             tipo_cliente = 'Mensalista'
         else:
+            logger.info(f"Nome buscado por placa: {placa}, tipo: {tipo_cliente}")
             cliente = Diarista.objects.filter(placa__iexact=placa).first()
             if cliente:
                 nome = cliente.nome
@@ -111,13 +117,14 @@ def buscar_saida_por_placa(request):
     valor_total = ''
 
     if placa:
+        logger.info(f"Consulta de saída iniciada para placa: {placa}")
         entrada = EntradaVeiculo.objects.filter(placa__iexact=placa).order_by('-horario_entrada').first()
 
         if not entrada:
             return JsonResponse({
                 'error': 'Nenhuma entrada encontrada para esta placa.'
             })
-
+        logger.warning(f"Nenhuma entrada encontrada para placa {placa}")
         # Verificar se o cliente é cadastrado
         mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
         diarista = Diarista.objects.filter(placa__iexact=placa).first()
@@ -126,15 +133,16 @@ def buscar_saida_por_placa(request):
             return JsonResponse({
                 'error': 'Cliente não cadastrado. Não é possível calcular a saída.'
             })
+        logger.warning(f"Cliente com placa {placa} não cadastrado")
 
         horario_saida = timezone.now()
         tempo = horario_saida - entrada.horario_entrada
 
         tipo_cliente, valor = calcular_valor(placa, tempo)
-
+        
         tempo_permanencia = formatar_tempo(tempo)
         valor_total = f'{valor:.2f}'
-
+        logger.info(f"Saída simulada: placa={placa}, tipo={tipo_cliente}, tempo={tempo_permanencia}, valor=R${valor_total}")
         return JsonResponse({
             'tipo_cliente': tipo_cliente,
             'tempo_permanencia': tempo_permanencia,
@@ -153,14 +161,17 @@ def registrar_saida_view(request):
             entrada = EntradaVeiculo.objects.filter(
                 placa__iexact=placa
             ).order_by('-horario_entrada').first()
+            logger.info(f"Início de registro de saída para placa {placa} por {request.user}")
 
             if not entrada:
                 messages.error(request, '❌ Nenhuma entrada encontrada para esta placa.')
+                logger.warning(f"Saída sem entrada para placa {placa}")
                 return redirect('vagas:registrar_saida')
 
             saida_existente = SaidaVeiculo.objects.filter(entrada=entrada).first()
             if saida_existente:
                 messages.error(request, '⚠️ Esta entrada já possui uma saída registrada.')
+                logger.warning(f"Saída duplicada detectada para entrada de placa {placa}")
                 return redirect('vagas:registrar_saida')
 
             horario_saida = timezone.now()
@@ -170,6 +181,7 @@ def registrar_saida_view(request):
 
             if tipo_cliente == 'Não cadastrado':
                 messages.error(request, '❌ Veículo não cadastrado. Cadastre o cliente antes de registrar a saída.')
+                logger.warning(f"Veículo com placa {placa} não está cadastrado")
                 return redirect('vagas:registrar_saida')
 
             # Registrar saída
@@ -196,10 +208,14 @@ def registrar_saida_view(request):
             # Liberar vaga
             entrada.vaga.status = 'Livre'
             entrada.vaga.save()
+            entrada.saidas.add(saida)  # Adiciona a saída à entrada
 
             messages.success(request, '✅ Saída registrada e vaga liberada com sucesso!')
-            return redirect('pagamentos:listar_cobranca')
-
+            logger.info(f"Saída registrada: placa={placa}, tempo={tempo_permanencia}, valor=R${valor_total}, por {request.user}")
+            if tipo_cliente == 'Diarista':
+                messages.success(request, 'Cobrança diária criada com sucesso!')
+                logger.info(f"Cobrança diária criada para placa {placa}, valor: R${valor_total}") 
+                return redirect('pagamentos:listar_cobranca')
     else:
         form = SaidaVeiculoForm()
 
@@ -231,6 +247,7 @@ def api_status_vagas(request):
             if manutencao:
                 item['descricao'] = manutencao.descricao
         data.append(item)
+        logger.debug("Status das vagas atualizado via API")
     return JsonResponse({'vagas': data})
 
 def solicitar_manutencao(request):
@@ -240,6 +257,7 @@ def solicitar_manutencao(request):
             solicitacao = form.save(commit=False)
             solicitacao.solicitante = request.user
             solicitacao.save()
+            logger.info(f"Usuário {request.user} solicitou manutenção para vaga {vaga.numero}")
 
             # Atualizar o status da vaga para "Manutenção"
             vaga = solicitacao.numero_vaga  # Já é um objeto Vaga
@@ -254,6 +272,7 @@ def solicitar_manutencao(request):
     return render(request, 'vagas/solicitar_manutencao.html', {'form': form})
 
 def relatorio_uso_vagas(request):
+    logger.info(f"Usuário {request.user} visualizou o relatório de uso de vagas.")
     total_vagas = Vaga.objects.count()
     vagas_ocupadas = Vaga.objects.filter(status='Ocupada').count()
     vagas_livres = total_vagas - vagas_ocupadas

@@ -5,7 +5,9 @@ from django.contrib.auth import authenticate,logout,login # Import authenticate,
 from django.contrib.auth.decorators import login_required # Import login_required decorator
 from django.contrib import messages # Import messages framework for displaying messages
 from django.contrib.auth.decorators import user_passes_test # Import user_passes_test decorator
+import logging
 
+logger = logging.getLogger('usuarios')
 
 # Redirect to login page
 def redirect_to_login(request):
@@ -32,20 +34,24 @@ def is_frentista(user):
 
 '''
 # Login page
-def login_parkcontrol(request):
+# Redireciona para o login
+def redirect_to_login(request):
+    logger.info(f"Usuário não autenticado redirecionado para login.")
+    return redirect('usuarios:login_parkcontrol')
 
-    # Check if the user is already authenticated
+
+# LOGIN
+def login_parkcontrol(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
 
-        # Check if the user is authenticated
         if user is not None:
             login(request, user)
-             # Redirecionamento por perfil
             perfil = getattr(user, 'perfil_acesso', None)
+            logger.info(f"Usuário {username} autenticado com sucesso. Perfil: {perfil}")
 
             if perfil == 'Administrador':
                 return redirect('usuarios:dashboard_administrador')
@@ -54,45 +60,46 @@ def login_parkcontrol(request):
             elif perfil == 'Contador':
                 return redirect('usuarios:dashboard_contador')
             else:
+                logger.warning(f"Usuário {username} autenticado, mas sem perfil válido.")
                 messages.warning(request, 'Perfil de acesso não identificado.')
                 return redirect('usuarios:login_parkcontrol')
         else:
+            logger.warning(f"Tentativa de login falhou para usuário: {username}")
             messages.error(request, 'E-mail ou senha inválidos.')
             return render(request, 'autenticacao/login.html')
     else:
-        # If the request method is GET, render the login page
-        return render(request, 'autenticacao/login.html') 
+        logger.debug("Página de login renderizada via GET")
+        return render(request, 'autenticacao/login.html')
 
+
+# LOGOUT
 def logout_parkcontrol(request):
-    logout(request)    
+    logger.info(f"Usuário {request.user} fez logout.")
+    logout(request)
     return render(request, 'autenticacao/logout.html')
 
 
-'''
-
-    DASHBOARD
-
-'''
-
-# Dashboard for Administrador
+# DASHBOARDS
 @login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador, login_url='login_parkcontrol')
 def dashboard_administrador(request):
+    logger.info(f"Dashboard administrador acessado por {request.user}")
     return render(request, 'usuarios/administrador/dashboard_administrador.html')
 
-# Dashboard for Contador
 @login_required(login_url='login_parkcontrol')
 @user_passes_test(is_contador, login_url='login_parkcontrol')
 def dashboard_contador(request):
+    logger.info(f"Dashboard contador acessado por {request.user}")
     return render(request, 'usuarios/contador/dashboard_contador.html')
 
-# Dashboard for Frentista
 @login_required(login_url='login_parkcontrol')
 @user_passes_test(is_frentista, login_url='login_parkcontrol')
 def dashboard_frentista(request):
+    logger.info(f"Dashboard frentista acessado por {request.user}")
     return render(request, 'usuarios/frentista/dashboard_frentista.html')
 
 
-#esqueci a senha
+# Recuperação de senha
 def recuperar_senha(request):
+    logger.debug("Página de recuperação de senha acessada.")
     return render(request, 'autenticacao/recuperar-senha.html')
