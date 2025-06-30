@@ -187,6 +187,7 @@ def registrar_saida_view(request):
             # Registrar saída
             saida = SaidaVeiculo.objects.create(
                 entrada=entrada,
+                placa=entrada.placa,
                 tempo_permanencia=tempo_permanencia,
                 horario_saida=horario_saida,
                 valor_total=valor_total,
