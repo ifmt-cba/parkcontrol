@@ -10,7 +10,8 @@ class LoginUsuarioTests(TestCase):
         self.usuario = User.objects.create_user(
             username='admin',
             email='admin@email.com',
-            password='admin123'
+            password='admin123',
+            perfil_acesso='Administrador'
         )
 
     def test_login_com_credenciais_validas(self):
