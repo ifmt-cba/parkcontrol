@@ -1,32 +1,35 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.core import mail
 
 User = get_user_model()
 
-class RecuperacaoSenhaTests(TestCase):
+class LoginUsuarioTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.usuario = User.objects.create_user(
             username='admin',
             email='admin@email.com',
-            first_name='Admin',
-            password='admin123'
+            password='admin123',
+            perfil_acesso='Administrador'
         )
 
-    def test_recuperacao_com_dados_validos(self):
-        response = self.client.post(reverse('recuperar_senha'), {
-            'email': 'admin@email.com',
-            'nome': 'Admin'
+    def test_login_com_credenciais_validas(self):
+        response = self.client.post(reverse('usuarios:login_parkcontrol'), {
+            'username': 'admin',
+            'password': 'admin123'
         })
 
-        # Verifica que a mensagem de sucesso está na página
-        self.assertContains(response, 'E-mail de redefinição enviado com sucesso.')
+        # Redireciona para alguma dashboard (como administrador)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('usuarios:dashboard_administrador'))
 
-        # Verifica que um e-mail foi realmente enviado
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Redefinição de Senha', mail.outbox[0].subject)
-        self.assertIn('admin@email.com', mail.outbox[0].to)
+    def test_login_com_credenciais_invalidas(self):
+        response = self.client.post(reverse('usuarios:login_parkcontrol'), {
+            'username': 'admin',
+            'password': 'senhaerrada'
+        })
 
-        #  http://localhost:8000/usuarios/recuperar-senha/
+        # Página recarrega com erro
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'E-mail ou senha inválidos.')
