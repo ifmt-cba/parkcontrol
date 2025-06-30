@@ -16,3 +16,6 @@ pytz>=2024.1
 
 # Histórico de alterações em modelos
 django-simple-history>=3.4.0
+
+# Servidor WSGI para produção
+gunicorn>=21.2.0

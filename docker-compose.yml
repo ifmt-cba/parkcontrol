@@ -1,14 +1,32 @@
-version: '3.9'
+version: '3.8'
 
 services:
   web:
     build:
       context: .
     container_name: parkcontrol_web
-    command: python parkcontrol/manage.py runserver 0.0.0.0:8000
+    command: gunicorn parkcontrol.wsgi:application --chdir parkcontrol --bind 0.0.0.0:8000
     volumes:
       - .:/app
-    ports:
-      - "80:8000"
     env_file:
       - .env
+    networks:
+      - parkcontrol
+
+  nginx:
+    image: nginx:1.24
+    container_name: nginx_https
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - web
+    networks:
+      - parkcontrol
+
+networks:
+  parkcontrol:
+    driver: bridge

@@ -22,5 +22,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copia todos os arquivos do projeto
 COPY . .
 
-# Comando padrão: roda o servidor Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Expõe a porta 8000 (documentação)
+EXPOSE 8000
+
+# Comando padrão: roda o Gunicorn na porta 8000, com diretório 'parkcontrol'
+CMD ["gunicorn", "parkcontrol.wsgi:application", "--chdir", "parkcontrol", "--bind", "0.0.0.0:8000"]
