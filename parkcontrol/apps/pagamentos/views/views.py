@@ -44,6 +44,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
     Lista clientes Mensalista
     """
     query_nome = request.GET.get('nome_cliente', '').strip()
+    query_plano = request.GET.get('plano', '').strip()
     status_filter = request.GET.get('status', 'ativo').strip()
     query_placa = request.GET.get('placa_veiculo', '').strip()
 
@@ -57,6 +58,9 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
     
     if query_nome:
         clientes_filtrados = clientes_filtrados.filter(nome__icontains=query_nome) 
+
+    if query_plano:
+        clientes_filtrados = clientes_filtrados.filter(plano__nome__icontains=query_plano)
 
     if query_placa:
         clientes_filtrados = clientes_filtrados.filter(placa__icontains=query_placa)
@@ -87,6 +91,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         'titulo_pagina': 'Gerar Cobrança: Clientes Mensalistas',
         'page_obj': page_obj, 
         'query_nome': query_nome,
+        'query_plano': query_plano,
         'status_filter': status_filter,
         'query_placa': query_placa,
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
@@ -302,6 +307,27 @@ def listar_cobrancas_mensalistas(request):
     }
     return render(request, 'pagamentos/mensalistas/listar_cobrancas.html', context)
 
+
+def listar_cobrancas_cliente(request, cliente_id):
+    """
+    Lista todas as cobranças de um cliente mensalista específico.
+    """
+    cliente = get_object_or_404(Mensalista, id=cliente_id)
+
+    cobrancas_do_cliente = CobrancaMensalista.objects.filter(
+        cliente_mensalista=cliente
+    ).order_by('-data_geracao')
+
+    paginator = Paginator(cobrancas_do_cliente, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'titulo_pagina': f'Cobranças de {cliente.nome}',
+        'cliente': cliente,
+        'page_obj': page_obj,
+    }
+    return render(request, 'pagamentos/mensalistas/listar_cobrancas_cliente.html', context)
 
 def detalhe_cobranca_mensalista(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
