@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-+=0s*mo_^)l^psebmk$9yww0o9wn%*2q%ift)1w*^+_45^(1mh
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "parkcontrol.com.br", "localhost", "127.0.0.1"
+    "parkcontrol.com.br",
+    "localhost",
+    "127.0.0.1",
+    "web",  # nome do serviço usado dentro do Docker
 ]
 
 

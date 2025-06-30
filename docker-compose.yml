@@ -10,6 +10,8 @@ services:
       - .:/app
     env_file:
       - .env
+    expose:
+      - "8000"
     networks:
       - parkcontrol
 
