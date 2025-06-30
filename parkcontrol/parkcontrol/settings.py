@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',  # Para histórico de alterações nos modelos
     
     # Apps da aplicação
     'apps.clientes',
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',  # Middleware para histórico de alterações
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -144,3 +146,106 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ## para testes com console
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@parkcontrol.com'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'detailed': {
+            'format': '[{asctime}] {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'clientes_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/clientes.log'),
+            'formatter': 'detailed',
+        },
+        'manutencao_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/manutencao.log'),
+            'formatter': 'detailed',
+        },
+        'pagamentos_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/pagamentos.log'),
+            'formatter': 'detailed',
+        },
+        'planos_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/planos.log'),
+            'formatter': 'detailed',
+        },
+        'relatorios_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/relatorios.log'),
+            'formatter': 'detailed',
+        },
+        'usuarios_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/usuarios.log'),
+            'formatter': 'detailed',
+        },
+        'vagas_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/vagas.log'),
+            'formatter': 'detailed',
+        },
+        'frentistas_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/frentistas.log'),
+            'formatter': 'detailed',
+        },
+    },
+    'loggers': {
+        'clientes': {
+            'handlers': ['clientes_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'manutencao': {
+            'handlers': ['manutencao_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'pagamentos': {
+            'handlers': ['pagamentos_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'planos': {
+            'handlers': ['planos_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'relatorios': {
+            'handlers': ['relatorios_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'usuarios': {
+            'handlers': ['usuarios_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'vagas': {
+            'handlers': ['vagas_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'frentistas': {
+            'handlers': ['frentistas_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

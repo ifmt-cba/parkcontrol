@@ -1,5 +1,5 @@
 # apps/pagamentos/views/views.py
-
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
@@ -27,22 +27,27 @@ from ..forms import GerarCobrancaMensalForm, CobrancaMensalistaStatusForm
 
 # --- Views para Contador (Gerenciamento de Pagamentos) ---
 
+logger = logging.getLogger('pagamentos')  # Logger para o app pagamentos
+
 def gerenciamento_pagamentos_home(request):
     """
     Interface principal do módulo Gerenciamento de Pagamentos para o Contador.
     """
+    logger.info(f"Usuário {request.user} acessou a home do gerenciamento de pagamentos.")
     return render(request, 'pagamentos/gerenciamento_pagamentos_home.html')
 
 def listagem_pagamentos_geral_redirect(request):
     """
     View auxiliar para o botão "Visualizar e Editar Pagamentos"
     """
+    logger.info(f"Usuário {request.user} redirecionado para listagem de cobranças mensalistas.")
     return redirect('pagamentos:listar_cobrancas_mensalistas') 
 
 def gerar_pagamentos_mensalistas_lista_clientes(request):
     """
     Lista clientes Mensalista
     """
+    logger.info(f"Usuário {request.user} acessou a lista de clientes mensalistas para geração de pagamentos.")
     query_nome = request.GET.get('nome_cliente', '').strip()
     query_plano = request.GET.get('plano', '').strip()
     status_filter = request.GET.get('status', 'ativo').strip()
@@ -97,7 +102,8 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
     })
 
-def gerar_pagamentos_mensalistas_manual(request, cliente_id): 
+def gerar_pagamentos_mensalistas_manual(request, cliente_id):
+    logger.info(f"Usuário {request.user} iniciou geração manual de pagamento para cliente ID {cliente_id}.") 
     cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id) 
 
     valor_devido_calculado = Decimal('0.00')
@@ -153,7 +159,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
                     status='pendente',
                 )
                 messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
-
+                logger.info(f"Cobrança mensal gerada manualmente para cliente ID {cliente_id} pelo usuário {request.user}.")
             try:
                 html_message = render_to_string('pagamentos/enviar_email_cobranca.html', {'cobranca': nova_cobranca})
                 plain_message = strip_tags(html_message)
@@ -166,7 +172,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
                 messages.info(request, f"E-mail de cobrança enviado para {cliente_mensalista_obj.email}.")
             except Exception as e:
                 messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
-
+                logger.error(f"Erro ao enviar e-mail para cobrança manual do cliente ID {cliente_id}: {e}")
             return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id) 
 
         else:
@@ -180,6 +186,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
         return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
 
 def gerar_cobranca_imediata(request, cliente_id):
+        logger.info(f"Usuário {request.user} iniciou geração imediata de cobrança para cliente ID {cliente_id}.")
         cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id)
 
         valor_devido_calculado = Decimal('0.00')
@@ -234,6 +241,7 @@ def gerar_cobranca_imediata(request, cliente_id):
                 status='pendente',
             )
             messages.success(request, f"Cobrança mensal gerada com sucesso para {cliente_mensalista_obj.nome} referente a {mes_referencia_str}.")
+            logger.info(f"Cobrança imediata gerada para cliente ID {cliente_id} pelo usuário {request.user}.")
         try:
             html_message = render_to_string('pagamentos/enviar_email_cobranca.html', {'cobranca': nova_cobranca})
             plain_message = strip_tags(html_message)
@@ -246,11 +254,12 @@ def gerar_cobranca_imediata(request, cliente_id):
             messages.info(request, f"E-mail de cobrança enviado para {cliente_mensalista_obj.email}.")
         except Exception as e:
             messages.error(request, f"Erro ao enviar e-mail após geração: {e}. Verifique as configurações de e-mail.")
-        
+            logger.error(f"Erro ao enviar e-mail para cobrança imediata do cliente ID {cliente_id}: {e}")
         return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id)
 
 
 def cobranca_gerada_confirmacao(request, cobranca_id):
+    logger.info(f"Usuário {request.user} visualizou confirmação de cobrança ID {cobranca_id} gerada.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
     return render(request, 'pagamentos/cobranca_gerada_confirmacao.html', {'cobranca': cobranca})
 
@@ -262,6 +271,9 @@ def listar_cobrancas_mensalistas(request):
     Esta view serve como a "Listagem de Pagamentos (Geral)" do caso de uso, focando em mensalistas.
     Os filtros agora incluem nome, plano e estado de pagamento.
     """
+    logger.info(f"Usuário {request.user} acessou listagem de cobranças mensalistas com filtros: "
+                f"nome='{request.GET.get('nome_cliente', '')}', plano='{request.GET.get('plano', '')}', "
+                f"mês='{request.GET.get('mes_referencia', '')}', status='{request.GET.get('status', '')}'")
     query_nome = request.GET.get('nome_cliente', '').strip()
     query_plano = request.GET.get('plano', '').strip() 
     query_mes = request.GET.get('mes_referencia', '').strip() 
@@ -330,10 +342,12 @@ def listar_cobrancas_cliente(request, cliente_id):
     return render(request, 'pagamentos/mensalistas/listar_cobrancas_cliente.html', context)
 
 def detalhe_cobranca_mensalista(request, cobranca_id):
+    logger.info(f"Usuário {request.user} visualizou detalhe da cobrança mensalista ID {cobranca_id}.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
     return render(request, 'pagamentos/mensalistas/detalhe_cobranca_mensalista.html', {'cobranca': cobranca})
 
 def editar_cobranca_mensalista_status(request, cobranca_id):
+    logger.info(f"Usuário {request.user} iniciou edição de status da cobrança ID {cobranca_id}.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
 
     if request.method == 'POST':
@@ -341,6 +355,7 @@ def editar_cobranca_mensalista_status(request, cobranca_id):
         if form.is_valid():
             with transaction.atomic():
                 form.save()
+                logger.info(f"Usuário {request.user} atualizou status da cobrança ID {cobranca_id} para '{cobranca.get_status_display()}'.")
                 messages.success(request, f"Status da cobrança de mensalista {cobranca.id} atualizado para '{cobranca.get_status_display()}'.")
                 if cobranca.status == 'pago' and not cobranca.data_pagamento:
                     cobranca.data_pagamento = timezone.now()
@@ -350,6 +365,7 @@ def editar_cobranca_mensalista_status(request, cobranca_id):
             for field, errors in form.errors.items():
                 for error in errors:
                     field_name = form[field].label or field
+                    logger.warning(f"Erro no formulário de edição de status da cobrança ID {cobranca_id} pelo usuário {request.user}. Erros: {form.errors}")
                     messages.error(request, f"Erro no campo '{field_name}': {error}")
     else:
         form = CobrancaMensalistaStatusForm(instance=cobranca)
@@ -361,6 +377,7 @@ def disparar_email_cobranca(request, cobranca_id):
     Lógica para realmente enviar o e-mail de cobrança para uma cobrança específica de mensalista.
     """
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
+    logger.info(f"Usuário {request.user} solicitou envio de e-mail para cobrança ID {cobranca_id}.")
 
     if not (cobranca.status == 'pendente' or cobranca.status == 'parcialmente_pago'):
         messages.error(request, "Não é possível enviar e-mail para cobranças já pagas ou canceladas.")
@@ -383,9 +400,10 @@ def disparar_email_cobranca(request, cobranca_id):
             fail_silently=False,
         )
         messages.success(request, f"E-mail de cobrança enviado com sucesso para {cobranca.cliente_mensalista.email}.")
+        logger.info(f"E-mail enviado para cobrança ID {cobranca_id} para {cobranca.cliente_mensalista.email}.")    
     except Exception as e:
         messages.error(request, f"Erro ao enviar e-mail: {e}. Verifique as configurações de e-mail.")
-    
+        logger.error(f"Erro ao enviar e-mail para cobrança ID {cobranca_id}: {e}")
     return redirect('pagamentos:listar_cobrancas_para_email')
 
 
@@ -393,6 +411,7 @@ def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
     """
     View para emitir recibo de uma cobrança, seja diarista ou mensalista.
     """
+    logger.info(f"Usuário {request.user} solicitou emissão de recibo para cobrança ID {cobranca_id} tipo '{tipo_cobranca_str}'.")
     if tipo_cobranca_str == 'mensalista':
         cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
     else:

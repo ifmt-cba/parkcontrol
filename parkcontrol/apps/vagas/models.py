@@ -3,11 +3,14 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.db import models
 from django.core.validators import RegexValidator
+from simple_history.models import HistoricalRecords
 
 
 class Vaga(models.Model):
     numero = models.CharField(max_length=100)
     status = models.CharField(max_length=100, choices=[('Livre', 'Livre'), ('Manutenção', 'Manutenção'), ('Ocupada', 'Ocupada')], default='Livre')
+
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
 
     def __str__(self):
         return f'Vaga {self.numero} - {self.status}'
@@ -35,6 +38,8 @@ class EntradaVeiculo(models.Model):
     blank=True
     )
 
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
+
     def __str__(self):
         return f'Nome: {self.nome} - Placa: {self.placa} - Horario Entrada:{self.horario_entrada}'
 
@@ -59,6 +64,8 @@ class SaidaVeiculo(models.Model):
     tempo_permanencia = models.DurationField(null=True, blank=True)
     horario_saida = models.DateTimeField(default=timezone.now)
     valor_total = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, default=0) 
+    
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
 
     def __str__(self):
         return f'Placa: {self.placa} - Tempo Permanencia: {self.tempo_permanencia} - R${self.valor_total}'
@@ -79,6 +86,8 @@ class SolicitacaoManutencao(models.Model):
         blank=True
     )
     resolvido = models.BooleanField(default=False)
+
+    historico = HistoricalRecords()  # Adiciona histórico de alterações
 
     def __str__(self):
         return f"Manutenção vaga {self.numero_vaga.numero} - {'Resolvido' if self.resolvido else 'Pendente'}"

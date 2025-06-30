@@ -1,3 +1,4 @@
+from simple_history.models import HistoricalRecords
 from django.db import models
 from django.utils import timezone
 from decimal import Decimal
@@ -19,7 +20,7 @@ class CobrancaDiaria(models.Model):
 
     horario_entrada = models.DateTimeField()
     horario_saida = models.DateTimeField()
-
+    historico = HistoricalRecords()
     def __str__(self):
         return f'{self.placa} - {self.data} - {self.status}'
     
@@ -42,7 +43,8 @@ class cliente_mensalista(models.Model):
         data_pagamento = models.DateTimeField(null=True, blank=True, verbose_name="Data do Pagamento")
     
         descricao = models.TextField(blank=True, null=True, verbose_name="Descrição Adicional")
-    
+
+        historico = HistoricalRecords()
         class Meta:
             verbose_name = "Cobrança de Mensalista"
             verbose_name_plural = "Cobranças de Mensalistas"
@@ -50,7 +52,7 @@ class cliente_mensalista(models.Model):
             unique_together = (('cliente_mensalista', 'mes_referencia'),)
 
         def __str__(self):
-            return f"Mensalidade {self.mes_referencia} - {self.cliente_mensalista.usuario.username} - R${self.valor_devido:.2f} ({self.status})"
+            return f"Mensalidade {self.mes_referencia} - {self.cliente_mensalista.nome} - R${self.valor_devido:.2f} ({self.status})"
 
         def esta_vencida(self):
             return self.data_vencimento and self.data_vencimento < timezone.now().date() and self.status == 'pendente'
@@ -101,6 +103,7 @@ class CobrancaMensalista(models.Model):
     
     descricao = models.TextField(blank=True, null=True, verbose_name="Descrição Adicional")
     
+    historico = HistoricalRecords()
     class Meta:
         verbose_name = "Cobrança de Mensalista"
         verbose_name_plural = "Cobranças de Mensalistas"
