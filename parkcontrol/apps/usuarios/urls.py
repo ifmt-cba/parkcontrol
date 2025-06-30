@@ -76,4 +76,3 @@ urlpatterns = [
     path('diaristas/', views.cliente_diarista_view, name='cliente_diarista'),
 
 ]
-
