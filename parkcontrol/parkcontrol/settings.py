@@ -11,9 +11,26 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config, Csv
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Carregando as variáveis do arquivo .env
+SECRET_KEY = config('SECRET_KEY')
+
+# O segundo argumento (default=False) é o valor padrão caso a variável não exista.
+# O 'cast=bool' converte o valor lido ('True'/'False') para um booleano (True/False).
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+# A função Csv da decouple é útil para converter uma string separada por vírgulas em uma lista Python.
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
 
 
 # Quick-start development settings - unsuitable for production
