@@ -14,7 +14,7 @@ from pathlib import Path
 from decouple import config, Csv
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carregando as variáveis do arquivo .env
 SECRET_KEY = config('SECRET_KEY')
@@ -26,26 +26,16 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # A função Csv da decouple é útil para converter uma string separada por vírgulas em uma lista Python.
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 LOG_DIR = BASE_DIR / 'logs'
-LOG_DIR.mkdir(exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+=0s*mo_^)l^psebmk$9yww0o9wn%*2q%ift)1w*^+_45^(1mh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    "*",
-]
-
 
 # Application definition
 
@@ -177,49 +167,49 @@ LOGGING = {
         'clientes_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/clientes.log'),
+            'filename': BASE_DIR / 'logs/clientes.log',
             'formatter': 'detailed',
         },
         'manutencao_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/manutencao.log'),
+            'filename': BASE_DIR / 'logs/manutencao.log',
             'formatter': 'detailed',
         },
         'pagamentos_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/pagamentos.log'),
+            'filename': BASE_DIR / 'logs/pagamentos.log',
             'formatter': 'detailed',
         },
         'planos_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/planos.log'),
+            'filename': BASE_DIR / 'logs/planos.log',
             'formatter': 'detailed',
         },
         'relatorios_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/relatorios.log'),
+            'filename': BASE_DIR / 'logs/relatorios.log',
             'formatter': 'detailed',
         },
         'usuarios_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/usuarios.log'),
+            'filename': BASE_DIR / 'logs/usuarios.log',
             'formatter': 'detailed',
         },
         'vagas_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/vagas.log'),
+            'filename': BASE_DIR / 'logs/vagas.log',
             'formatter': 'detailed',
         },
         'frentistas_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/frentistas.log'),
+            'filename': BASE_DIR / 'logs/frentistas.log',
             'formatter': 'detailed',
         },
     },
