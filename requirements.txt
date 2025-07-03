@@ -19,3 +19,4 @@ django-simple-history>=3.4.0
 
 # Servidor WSGI para produção
 gunicorn>=21.2.0
+whitenoise>=6.6.0

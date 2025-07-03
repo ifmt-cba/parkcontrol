@@ -8,10 +8,11 @@ services:
     command: gunicorn parkcontrol.wsgi:application --chdir parkcontrol --bind 0.0.0.0:8000
     volumes:
       - .:/app
+      - staticfiles:/app/ParkControl/staticfiles
     env_file:
       - .env
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     networks:
       - parkcontrol
 
@@ -24,6 +25,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
+      - staticfiles:/static 
     depends_on:
       - web
     networks:
@@ -32,3 +34,7 @@ services:
 networks:
   parkcontrol:
     driver: bridge
+
+volumes:
+  pgdata:
+  staticfiles:
