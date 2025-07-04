@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger('pagamentos')  # logger para o app pagamentos
 
-@login_required(login_url='login_parkcontrol')
 def formatar_tempo(tempo):
     total_seconds = int(tempo.total_seconds())
     horas = total_seconds // 3600

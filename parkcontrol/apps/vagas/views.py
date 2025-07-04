@@ -62,7 +62,6 @@ def registrar_entrada_view(request):
         form = EntradaVeiculoForm()
     return render(request, 'vagas/entrada.html', {'form': form})
 
-@login_required(login_url='login_parkcontrol')
 def buscar_nome_por_placa(request):
     placa = request.GET.get('placa')
     nome = ''
@@ -83,25 +82,26 @@ def buscar_nome_por_placa(request):
 
     return JsonResponse({'nome': nome, 'tipo_cliente': tipo_cliente})
 
-@login_required(login_url='login_parkcontrol')
 def formatar_tempo(tempo):
     horas = tempo.seconds // 3600
     minutos = (tempo.seconds % 3600) // 60
     return f'{horas}h {minutos}min'
 
-@login_required(login_url='login_parkcontrol')
 def calcular_valor(placa, tempo):
     segundos = tempo.total_seconds()
 
     mensalista = Mensalista.objects.filter(placa__iexact=placa).first()
-    diarista = Diarista.objects.filter(placa__iexact=placa).first()
-
     if mensalista:
         return 'Mensalista', 0.0
-
+    
+    diarista = Diarista.objects.filter(placa__iexact=placa).first()
     if diarista:
         plano = diarista.plano
-        valor_plano = plano.valor if plano else 0.0
+
+        if not plano or plano.valor is None:
+            valor_plano = 0.0
+        else:
+            valor_plano = plano.valor
 
         if segundos <= 600:
             return 'Diarista', 0.0
@@ -115,7 +115,6 @@ def calcular_valor(placa, tempo):
     # NÃO retorna 'Não cadastrado', só None
     return None, None
 
-@login_required(login_url='login_parkcontrol')
 def buscar_saida_por_placa(request):
     placa = request.GET.get('placa')
     tipo_cliente = ''

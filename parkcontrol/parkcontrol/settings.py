@@ -21,7 +21,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 # O segundo argumento (default=False) é o valor padrão caso a variável não exista.
 # O 'cast=bool' converte o valor lido ('True'/'False') para um booleano (True/False).
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
 
 # A função Csv da decouple é útil para converter uma string separada por vírgulas em uma lista Python.
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
