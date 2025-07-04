@@ -8,7 +8,7 @@ services:
     command: gunicorn parkcontrol.wsgi:application --chdir parkcontrol --bind 0.0.0.0:8000
     volumes:
       - .:/app
-      - staticfiles:/app/ParkControl/staticfiles
+      - staticfiles:/app/parkcontrol/staticfiles
     env_file:
       - .env
     ports:
