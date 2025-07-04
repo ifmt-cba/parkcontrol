@@ -35,17 +35,6 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = [
-    "parkcontrol.com.br",
-    "localhost",
-    "127.0.0.1",
-    "web",  # nome do serviço usado dentro do Docker
-]
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -163,8 +152,13 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ## para testes com console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@parkcontrol.com'
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+
+EMAIL_HOST = config('EMAIL_HOST')           # servidor SMTP do provedor (exemplo Gmail)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')                    # TLS para segurança
+EMAIL_PORT = config('EMAIL_PORT')                       # porta do servidor SMTP
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')    # seu email
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
