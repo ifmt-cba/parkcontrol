@@ -216,8 +216,7 @@ def registrar_saida_view(request):
             # Liberar vaga
             entrada.vaga.status = 'Livre'
             entrada.vaga.save()
-            entrada.saidas.add(saida)  # Adiciona a saída à entrada
-
+            
             messages.success(request, '✅ Saída registrada e vaga liberada com sucesso!')
             logger.info(f"Saída registrada: placa={placa}, tempo={tempo_permanencia}, valor=R${valor_total}, por {request.user}")
             if tipo_cliente == 'Diarista':
