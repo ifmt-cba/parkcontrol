@@ -10,6 +10,8 @@ from decimal import Decimal
 from datetime import datetime, date, timedelta
 import calendar
 import re 
+from django.contrib.auth.decorators import login_required
+
 
 # ---Importações de outros apps ---
 from apps.clientes.models import Mensalista
@@ -29,6 +31,7 @@ from ..forms import GerarCobrancaMensalForm, CobrancaMensalistaStatusForm
 
 logger = logging.getLogger('pagamentos')  # Logger para o app pagamentos
 
+@login_required(login_url='login_parkcontrol')
 def gerenciamento_pagamentos_home(request):
     """
     Interface principal do módulo Gerenciamento de Pagamentos para o Contador.
@@ -36,6 +39,7 @@ def gerenciamento_pagamentos_home(request):
     logger.info(f"Usuário {request.user} acessou a home do gerenciamento de pagamentos.")
     return render(request, 'pagamentos/gerenciamento_pagamentos_home.html')
 
+@login_required(login_url='login_parkcontrol')
 def listagem_pagamentos_geral_redirect(request):
     """
     View auxiliar para o botão "Visualizar e Editar Pagamentos"
@@ -43,6 +47,7 @@ def listagem_pagamentos_geral_redirect(request):
     logger.info(f"Usuário {request.user} redirecionado para listagem de cobranças mensalistas.")
     return redirect('pagamentos:listar_cobrancas_mensalistas') 
 
+@login_required(login_url='login_parkcontrol')
 def gerar_pagamentos_mensalistas_lista_clientes(request):
     """
     Lista clientes Mensalista
@@ -102,6 +107,7 @@ def gerar_pagamentos_mensalistas_lista_clientes(request):
         'status_choices': [('ativo', 'Ativo'), ('inativo', 'Inativo'), ('todos', 'Todos')]
     })
 
+@login_required(login_url='login_parkcontrol')
 def gerar_pagamentos_mensalistas_manual(request, cliente_id):
     logger.info(f"Usuário {request.user} iniciou geração manual de pagamento para cliente ID {cliente_id}.") 
     cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id) 
@@ -185,6 +191,7 @@ def gerar_pagamentos_mensalistas_manual(request, cliente_id):
         context = {'form': form, 'cliente': cliente_mensalista_obj}
         return render(request, 'pagamentos/mensalistas/gerar_pagamentos_mensalistas_manual.html', context)
 
+@login_required(login_url='login_parkcontrol')
 def gerar_cobranca_imediata(request, cliente_id):
         logger.info(f"Usuário {request.user} iniciou geração imediata de cobrança para cliente ID {cliente_id}.")
         cliente_mensalista_obj = get_object_or_404(Mensalista, id=cliente_id)
@@ -257,7 +264,7 @@ def gerar_cobranca_imediata(request, cliente_id):
             logger.error(f"Erro ao enviar e-mail para cobrança imediata do cliente ID {cliente_id}: {e}")
         return redirect('pagamentos:cobranca_gerada_confirmacao', cobranca_id=nova_cobranca.id)
 
-
+@login_required(login_url='login_parkcontrol')
 def cobranca_gerada_confirmacao(request, cobranca_id):
     logger.info(f"Usuário {request.user} visualizou confirmação de cobrança ID {cobranca_id} gerada.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
@@ -265,6 +272,7 @@ def cobranca_gerada_confirmacao(request, cobranca_id):
 
 # --- Cobranças de Mensalistas (CRUD para o Contador) ---
 
+@login_required(login_url='login_parkcontrol')
 def listar_cobrancas_mensalistas(request):
     """
     Lista todas as cobranças de mensalistas, com filtros e paginação.
@@ -319,7 +327,7 @@ def listar_cobrancas_mensalistas(request):
     }
     return render(request, 'pagamentos/mensalistas/listar_cobrancas.html', context)
 
-
+@login_required(login_url='login_parkcontrol')
 def listar_cobrancas_cliente(request, cliente_id):
     """
     Lista todas as cobranças de um cliente mensalista específico.
@@ -341,11 +349,13 @@ def listar_cobrancas_cliente(request, cliente_id):
     }
     return render(request, 'pagamentos/mensalistas/listar_cobrancas_cliente.html', context)
 
+@login_required(login_url='login_parkcontrol')
 def detalhe_cobranca_mensalista(request, cobranca_id):
     logger.info(f"Usuário {request.user} visualizou detalhe da cobrança mensalista ID {cobranca_id}.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
     return render(request, 'pagamentos/mensalistas/detalhe_cobranca_mensalista.html', {'cobranca': cobranca})
 
+@login_required(login_url='login_parkcontrol')
 def editar_cobranca_mensalista_status(request, cobranca_id):
     logger.info(f"Usuário {request.user} iniciou edição de status da cobrança ID {cobranca_id}.")
     cobranca = get_object_or_404(CobrancaMensalista, id=cobranca_id)
@@ -372,6 +382,7 @@ def editar_cobranca_mensalista_status(request, cobranca_id):
 
     return render(request, 'pagamentos/mensalistas/editar_cobranca_mensalista_status.html', {'form': form, 'cobranca': cobranca})
 
+@login_required(login_url='login_parkcontrol')
 def disparar_email_cobranca(request, cobranca_id):
     """
     Lógica para realmente enviar o e-mail de cobrança para uma cobrança específica de mensalista.
@@ -406,7 +417,7 @@ def disparar_email_cobranca(request, cobranca_id):
         logger.error(f"Erro ao enviar e-mail para cobrança ID {cobranca_id}: {e}")
     return redirect('pagamentos:listar_cobrancas_para_email')
 
-
+@login_required(login_url='login_parkcontrol')
 def emitir_recibo(request, cobranca_id, tipo_cobranca_str):
     """
     View para emitir recibo de uma cobrança, seja diarista ou mensalista.

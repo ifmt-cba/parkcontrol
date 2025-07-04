@@ -11,23 +11,24 @@ from django.db.models import Sum
 
 logger = logging.getLogger('relatorios')
 
+@login_required(login_url='login_parkcontrol')
 def relatorios(request):
     logger.info(f"Usuário {request.user} acessou a página principal de relatórios.")
     return render(request, 'relatorios.html')
 
-@login_required
+@login_required(login_url='login_parkcontrol')
 def listar_relatorios(request):
     logger.info(f"Usuário {request.user} listou os relatórios financeiros.")
     relatorios = RelatorioFinanceiro.objects.all().order_by('-editado_em')
     return render(request, 'relatorios/listar.html', {'relatorios': relatorios})
 
-@login_required
+@login_required(login_url='login_parkcontrol')
 def visualizar_relatorio(request, id):
     relatorio = get_object_or_404(RelatorioFinanceiro, pk=id)
     logger.info(f"Usuário {request.user} visualizou o relatório ID={relatorio.id}.")
     return render(request, 'relatorios/visualizar.html', {'relatorio': relatorio})
 
-@login_required
+@login_required(login_url='login_parkcontrol')
 def criar_relatorio(request):
     if request.method == 'POST':
         form = FormularioRelatorioFinanceiro(request.POST)
@@ -71,7 +72,7 @@ def criar_relatorio(request):
         form = FormularioRelatorioFinanceiro()
     return render(request, 'relatorios/criar.html', {'form': form})
 
-@login_required
+@login_required(login_url='login_parkcontrol')
 def editar_relatorio(request, id):
     relatorio = get_object_or_404(RelatorioFinanceiro, pk=id)
 
@@ -90,7 +91,7 @@ def editar_relatorio(request, id):
 
     return render(request, 'relatorios/editar.html', {'form': form, 'relatorio': relatorio})
 
-@login_required
+@login_required(login_url='login_parkcontrol')
 def excluir_relatorio(request, id):
     relatorio = get_object_or_404(RelatorioFinanceiro, pk=id)
     if request.method == 'POST':

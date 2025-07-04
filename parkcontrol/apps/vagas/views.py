@@ -8,9 +8,11 @@ from apps.clientes.models import Mensalista, Diarista
 from .models import EntradaVeiculo, SaidaVeiculo, SolicitacaoManutencao, Vaga
 from django.utils import timezone
 from .forms import EntradaVeiculoForm, SaidaVeiculoForm, SolicitacaoManutencaoForm
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger('vagas')
 
+@login_required(login_url='login_parkcontrol')
 def registrar_entrada_view(request):
     if request.method == 'POST':
         form = EntradaVeiculoForm(request.POST)
@@ -60,6 +62,7 @@ def registrar_entrada_view(request):
         form = EntradaVeiculoForm()
     return render(request, 'vagas/entrada.html', {'form': form})
 
+@login_required(login_url='login_parkcontrol')
 def buscar_nome_por_placa(request):
     placa = request.GET.get('placa')
     nome = ''
@@ -80,11 +83,13 @@ def buscar_nome_por_placa(request):
 
     return JsonResponse({'nome': nome, 'tipo_cliente': tipo_cliente})
 
+@login_required(login_url='login_parkcontrol')
 def formatar_tempo(tempo):
     horas = tempo.seconds // 3600
     minutos = (tempo.seconds % 3600) // 60
     return f'{horas}h {minutos}min'
 
+@login_required(login_url='login_parkcontrol')
 def calcular_valor(placa, tempo):
     segundos = tempo.total_seconds()
 
@@ -110,6 +115,7 @@ def calcular_valor(placa, tempo):
     # NÃO retorna 'Não cadastrado', só None
     return None, None
 
+@login_required(login_url='login_parkcontrol')
 def buscar_saida_por_placa(request):
     placa = request.GET.get('placa')
     tipo_cliente = ''
@@ -153,6 +159,7 @@ def buscar_saida_por_placa(request):
         'error': 'Placa não informada.'
     })
 
+@login_required(login_url='login_parkcontrol')
 def registrar_saida_view(request):
     if request.method == 'POST':
         form = SaidaVeiculoForm(request.POST)
@@ -222,11 +229,14 @@ def registrar_saida_view(request):
 
     return render(request, 'vagas/saida.html', {'form': form})
 
+@login_required(login_url='login_parkcontrol')
 def status_vagas_view(request):
     vagas = Vaga.objects.all().order_by('numero')
     return render(request, 'vagas/status_vagas.html', {'vagas': vagas})
 
 # API para atualizar status em tempo real
+
+@login_required(login_url='login_parkcontrol')
 def api_status_vagas(request):
     vagas = Vaga.objects.all().order_by('numero')
     data = []
@@ -251,6 +261,7 @@ def api_status_vagas(request):
         logger.debug("Status das vagas atualizado via API")
     return JsonResponse({'vagas': data})
 
+@login_required(login_url='login_parkcontrol')
 def solicitar_manutencao(request):
     if request.method == 'POST':
         form = SolicitacaoManutencaoForm(request.POST)
@@ -258,10 +269,10 @@ def solicitar_manutencao(request):
             solicitacao = form.save(commit=False)
             solicitacao.solicitante = request.user
             solicitacao.save()
-            logger.info(f"Usuário {request.user} solicitou manutenção para vaga {vaga.numero}")
 
             # Atualizar o status da vaga para "Manutenção"
             vaga = solicitacao.numero_vaga  # Já é um objeto Vaga
+            logger.info(f"Usuário {request.user} solicitou manutenção para vaga {vaga.numero}")
             vaga.status = 'Manutenção'
             vaga.save()
 
@@ -272,6 +283,7 @@ def solicitar_manutencao(request):
 
     return render(request, 'vagas/solicitar_manutencao.html', {'form': form})
 
+@login_required(login_url='login_parkcontrol')
 def relatorio_uso_vagas(request):
     logger.info(f"Usuário {request.user} visualizou o relatório de uso de vagas.")
     total_vagas = Vaga.objects.count()

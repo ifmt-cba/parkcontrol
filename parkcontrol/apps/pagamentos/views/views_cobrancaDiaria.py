@@ -2,9 +2,11 @@ import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from apps.vagas.models import SaidaVeiculo
 from ..models import CobrancaDiaria
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger('pagamentos')  # logger para o app pagamentos
 
+@login_required(login_url='login_parkcontrol')
 def formatar_tempo(tempo):
     total_seconds = int(tempo.total_seconds())
     horas = total_seconds // 3600
@@ -12,11 +14,13 @@ def formatar_tempo(tempo):
     segundos = total_seconds % 60
     return f"{horas:02d}:{minutos:02d}:{segundos:02d}"
 
+@login_required(login_url='login_parkcontrol')
 def listar_cobrancas(request):
     cobrancas = CobrancaDiaria.objects.all().order_by('-data')
     logger.info(f"Listagem de cobranças acessada por usuário {request.user}. Total: {cobrancas.count()}")
     return render(request, 'pagamentos/listar_cobranca.html', {'cobrancas': cobrancas})
 
+@login_required(login_url='login_parkcontrol')
 def atualizar_status_cobranca(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaDiaria, id=cobranca_id)
     cobranca.status = 'Pago'
@@ -24,6 +28,7 @@ def atualizar_status_cobranca(request, cobranca_id):
     logger.info(f"Cobrança ID={cobranca_id} status alterado para Pago por usuário {request.user}.")
     return redirect('pagamentos:listar_cobranca')
 
+@login_required(login_url='login_parkcontrol')
 def emitir_recibo(request, cobranca_id):
     cobranca = get_object_or_404(CobrancaDiaria, id=cobranca_id)
 

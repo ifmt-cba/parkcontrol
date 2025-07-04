@@ -5,12 +5,15 @@ from .forms import MensalistaForm, DiaristaForm
 from .models import Mensalista, Diarista
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger('clientes')  # logger para o app clientes
 
+@login_required(login_url='login_parkcontrol')
 def cadastrar_clientes_view(request):
     return render(request, 'clientes/cadastrar_cliente.html')
 
+@login_required(login_url='login_parkcontrol')
 def cadastro_mensalistas_view(request):
     if request.method == 'POST':
         form = MensalistaForm(request.POST)
@@ -30,6 +33,7 @@ def cadastro_mensalistas_view(request):
         form = MensalistaForm()
     return render(request, 'clientes/cadastro_mensalista.html', {'form': form})
 
+@login_required(login_url='login_parkcontrol')
 def cadastro_diaristas_view(request):
     if request.method == 'POST':
         form = DiaristaForm(request.POST)
@@ -49,6 +53,7 @@ def cadastro_diaristas_view(request):
         form = DiaristaForm()
     return render(request, 'clientes/cadastro_diarista.html', {'form': form})
 
+@login_required(login_url='login_parkcontrol')
 def cliente_mensalista_view(request):
     mensalistas = Mensalista.objects.all()
     query_nome = request.GET.get('nome', '')
@@ -63,6 +68,7 @@ def cliente_mensalista_view(request):
 
     return render(request, 'clientes/cliente_mensalista.html', {'mensalistas': mensalistas, 'query_nome': query_nome, 'query_placa': query_placa})
 
+@login_required(login_url='login_parkcontrol')
 def editar_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
     if request.method == 'POST':
@@ -79,6 +85,7 @@ def editar_mensalista_view(request, pk):
         form = MensalistaForm(instance=mensalista)
     return render(request, 'clientes/editar_mensalista.html', {'form': form, 'mensalista': mensalista})
 
+@login_required(login_url='login_parkcontrol')
 def cliente_diarista_view(request):
     diaristas = Diarista.objects.all()
     query_nome = request.GET.get('nome', '')
@@ -93,6 +100,7 @@ def cliente_diarista_view(request):
 
     return render(request, 'clientes/cliente_diarista.html', {'diaristas': diaristas, 'query_nome': query_nome, 'query_placa': query_placa})
 
+@login_required(login_url='login_parkcontrol')
 def editar_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
     if request.method == 'POST':
@@ -109,6 +117,7 @@ def editar_diarista_view(request, pk):
         form = DiaristaForm(instance=diarista)
     return render(request, 'clientes/editar_diarista.html', {'form': form, 'diarista': diarista})
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def excluir_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
@@ -119,6 +128,7 @@ def excluir_mensalista_view(request, pk):
         return redirect('clientes:cliente_mensalista')
     return render(request, 'clientes/confirmar_exclusao.html', {'cliente': mensalista, 'tipo': 'Mensalista'})
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def excluir_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
@@ -129,6 +139,7 @@ def excluir_diarista_view(request, pk):
         return redirect('clientes:cliente_diarista')
     return render(request, 'clientes/confirmar_exclusao.html', {'cliente': diarista, 'tipo': 'Diarista'})
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def inativar_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
@@ -138,6 +149,7 @@ def inativar_diarista_view(request, pk):
     logger.info(f"Cliente diarista inativado: ID={pk}, Nome={diarista.nome}")
     return redirect('clientes:cliente_diarista')
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def ativar_diarista_view(request, pk):
     diarista = get_object_or_404(Diarista, pk=pk)
@@ -147,6 +159,7 @@ def ativar_diarista_view(request, pk):
     logger.info(f"Cliente diarista ativado: ID={pk}, Nome={diarista.nome}")
     return redirect('clientes:cliente_diarista')
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def ativar_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)
@@ -156,6 +169,7 @@ def ativar_mensalista_view(request, pk):
     logger.info(f"Cliente mensalista ativado: ID={pk}, Nome={mensalista.nome}")
     return redirect('clientes:cliente_mensalista')
 
+@login_required(login_url='login_parkcontrol')
 @user_passes_test(is_administrador)
 def inativar_mensalista_view(request, pk):
     mensalista = get_object_or_404(Mensalista, pk=pk)

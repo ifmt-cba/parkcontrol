@@ -5,9 +5,12 @@ from apps.usuarios.views.views_autenticacao import is_administrador
 from django.contrib import messages
 from apps.vagas.models import SolicitacaoManutencao, Vaga
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+
 
 logger = logging.getLogger('manutencao')  # logger para o app manutencao
 
+@login_required(login_url='login_parkcontrol')
 def manutencao_dashboard(request):
     filtro_vaga = request.GET.get('vaga')
     filtro_data = request.GET.get('data')
@@ -36,7 +39,7 @@ def manutencao_dashboard(request):
     }
     return render(request, 'manutencao/visualizar_solicitacoes.html', context)
 
-
+@login_required(login_url='login_parkcontrol')
 def encerrar_solicitacao(request, solicitacao_id):
     solicitacao = get_object_or_404(SolicitacaoManutencao, id=solicitacao_id)
 
@@ -58,7 +61,7 @@ def encerrar_solicitacao(request, solicitacao_id):
 
     return redirect('manutencao:manutencao_dashboard')
 
-
+@login_required(login_url='login_parkcontrol')
 def alterar_status_vaga(request, vaga_id):
     if request.method == 'POST':
         novo_status = request.POST.get('status')
